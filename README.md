@@ -1,4 +1,3 @@
-::: {align="center"}
 # Momentum --- Habit Studio
 
 **A privacy-conscious, installable habit tracker for building
