@@ -1,0 +1,2123 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Momentum — Habit Studio PWA</title>
+
+  <!-- PWA & Mobile Capable Meta Tags -->
+  <meta name="theme-color" content="#020617" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Momentum" />
+  <meta name="description" content="Interactive Daily Habit Tracker & Weekly Streak Studio" />
+
+  <!-- Dynamic SVG App Icon for Apple Touch & Favicon -->
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link id="favicon-link" rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%236366f1'/%3E%3Cstop offset='100%25' stop-color='%237c3aed'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='512' height='512' rx='120' fill='url(%23g)'/%3E%3Cpath d='M256 112c24 56 88 88 88 168 0 52-40 96-88 96s-88-44-88-96c0-36 20-68 42-94-4 26 14 46 30 46 18 0 26-26 16-120z' fill='%23ffffff'/%3E%3C/svg%3E" />
+  <link id="apple-touch-icon-link" rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%236366f1'/%3E%3Cstop offset='100%25' stop-color='%237c3aed'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='512' height='512' rx='120' fill='url(%23g)'/%3E%3Cpath d='M256 112c24 56 88 88 88 168 0 52-40 96-88 96s-88-44-88-96c0-36 20-68 42-94-4 26 14 46 30 46 18 0 26-26 16-120z' fill='%23ffffff'/%3E%3C/svg%3E" />
+
+  <!-- Google Fonts: Inter + Vazirmatn for Persian Install Guide -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Vazirmatn:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'Vazirmatn', 'system-ui', 'sans-serif'],
+            persian: ['Vazirmatn', 'Inter', 'sans-serif']
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    /* Safe area padding for notched iPhones and modern Android phones */
+    body {
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
+      padding-left: env(safe-area-inset-left);
+      padding-right: env(safe-area-inset-right);
+      -webkit-tap-highlight-color: transparent;
+      overscroll-behavior-y: none;
+    }
+
+    /* Hide scrollbar for Chrome, Safari and Opera */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    /* Hide scrollbar for IE, Edge and Firefox */
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    /* Smooth custom scrollbar for desktop table */
+    .custom-scrollbar::-webkit-scrollbar {
+      height: 6px;
+      width: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.6);
+      border-radius: 9999px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: rgba(71, 85, 105, 0.6);
+      border-radius: 9999px;
+    }
+
+    html[lang="fa"] body, html[lang="fa"] button, html[lang="fa"] input, html[lang="fa"] select { font-family: 'Vazirmatn', 'Inter', system-ui, sans-serif; }
+    html[dir="rtl"] .rtl-flip { transform: scaleX(-1); }
+    html[dir="rtl"] th, html[dir="rtl"] td { text-align: center; }
+    html[dir="rtl"] th:first-child { text-align: right; }
+    @keyframes popIn {
+      0% { opacity: 0; transform: scale(0.95) translateY(8px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .animate-pop {
+      animation: popIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+  </style>
+</head>
+
+<body class="min-h-screen bg-slate-950 text-slate-100 font-sans selection:bg-indigo-500 selection:text-white pb-20">
+  <!-- Ambient Background Glows -->
+  <div class="fixed inset-0 pointer-events-none overflow-hidden z-0">
+    <div class="absolute -top-40 -left-40 w-96 h-96 bg-indigo-600/10 rounded-full blur-3xl"></div>
+    <div class="absolute top-1/3 right-0 w-96 h-96 bg-emerald-600/10 rounded-full blur-3xl"></div>
+  </div>
+
+  <!-- Sticky Top App Bar -->
+  <header class="sticky top-0 z-30 backdrop-blur-xl bg-slate-950/85 border-b border-slate-800/80">
+    <div class="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 py-3.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      <!-- Brand Identity -->
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-lg shadow-indigo-500/25 border border-indigo-400/30 shrink-0">
+            <svg class="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>
+            </svg>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h1 class="text-lg sm:text-xl font-bold tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-400 bg-clip-text text-transparent">
+                Momentum
+              </h1>
+              <span id="pwa-status-badge" class="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-indigo-500/15 text-indigo-300 border border-indigo-500/30">
+                PWA Ready
+              </span>
+            </div>
+            <p id="header-today-date" class="text-xs text-slate-400"></p>
+          </div>
+        </div>
+
+        <!-- Mobile Quick Install Button -->
+        <button
+          id="mobile-install-btn"
+          onclick="openInstallModal()"
+          class="sm:hidden px-3 py-2 rounded-xl text-xs font-semibold font-persian bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 flex items-center gap-1.5 active:scale-95 transition"
+        >
+          <svg class="w-4 h-4 text-indigo-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+            <line x1="12" y1="18" x2="12.01" y2="18"></line>
+          </svg>
+          <span>نصب روی گوشی</span>
+        </button>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-0.5 sm:pb-0">
+        <!-- Install Guide Button (Desktop/Tablet) -->
+        <button
+          onclick="openInstallModal()"
+          class="hidden sm:inline-flex px-3 py-2 rounded-xl text-xs font-medium font-persian text-indigo-300 bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/25 transition items-center gap-1.5 shrink-0"
+        >
+          <svg class="w-4 h-4 text-indigo-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+            <line x1="12" y1="18" x2="12.01" y2="18"></line>
+          </svg>
+          <span>راهنمای نصب روی گوشی</span>
+        </button>
+
+        <button onclick="toggleLang()" id="lang-btn" class="px-3 py-2 rounded-xl text-xs font-semibold text-slate-200 bg-slate-900/90 hover:bg-slate-800 border border-slate-800 transition shrink-0">فارسی</button>
+        <button onclick="openAccountModal()" id="account-btn" class="px-3 py-2 rounded-xl text-xs font-medium text-slate-300 bg-slate-900/90 hover:bg-slate-800 border border-slate-800 transition shrink-0">👤 <span id="account-btn-label">Account</span></button>
+        <!-- Data Backup / Restore Button -->
+        <button
+          onclick="openBackupModal()"
+          title="Backup or Restore Data"
+          class="px-3 py-2 rounded-xl text-xs font-medium text-slate-300 bg-slate-900/90 hover:bg-slate-800 border border-slate-800 transition flex items-center gap-1.5 shrink-0"
+        >
+          <svg class="w-3.5 h-3.5 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          <span>Backup</span>
+        </button>
+
+        <!-- Complete All Today -->
+        <button
+          onclick="markAllToday()"
+          class="px-3 py-2 rounded-xl text-xs font-medium text-emerald-300 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/25 active:scale-95 transition flex items-center gap-1.5 shrink-0"
+        >
+          <svg class="w-4 h-4 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+          </svg>
+          <span>Complete Today</span>
+        </button>
+
+        <!-- Add New Habit -->
+        <button
+          onclick="openAddModal()"
+          class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-500 active:scale-95 shadow-lg shadow-indigo-600/25 transition flex items-center gap-1.5 shrink-0 ms-auto sm:ms-0"
+        >
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          <span>New Habit</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Dashboard Container -->
+  <main class="relative z-10 max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 pt-5 space-y-5">
+
+    <!-- Native PWA Install Prompt Banner (Shown automatically when browser triggers beforeinstallprompt) -->
+    <div id="native-install-banner" class="hidden bg-gradient-to-r from-indigo-900/60 via-violet-900/50 to-slate-900/80 border border-indigo-500/40 rounded-2xl p-4 flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-lg">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-indigo-500/20 border border-indigo-400/30 flex items-center justify-center text-indigo-300 shrink-0">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2v13"></path>
+            <path d="m16 11-4 4-4-4"></path>
+            <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"></path>
+          </svg>
+        </div>
+        <div>
+          <h3 class="text-sm font-bold text-white font-persian">نصب مستقیم اپلیکیشن Momentum روی گوشی</h3>
+          <p class="text-xs text-slate-300 font-persian">مرورگر شما از نصب مستقیم پشتیبانی می‌کند. برای اجرا به صورت تمام‌صفحه روی دکمه نصب بزنید.</p>
+        </div>
+      </div>
+      <button
+        onclick="triggerNativeInstall()"
+        class="px-4 py-2 rounded-xl text-xs font-bold font-persian bg-indigo-500 hover:bg-indigo-400 text-white shadow-md transition shrink-0 self-end sm:self-auto"
+      >
+        نصب اپلیکیشن (Install App)
+      </button>
+    </div>
+
+    <!-- KPI SUMMARY CARDS -->
+    <section id="kpi-cards-container" class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4"></section>
+
+    <!-- FILTER & WEEK NAVIGATION BAR -->
+    <section class="flex flex-col md:flex-row md:items-center justify-between gap-3.5 bg-slate-900/60 border border-slate-800/80 rounded-2xl p-3 sm:p-4">
+      <!-- Category Filter Pills -->
+      <div id="category-pills-container" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 md:pb-0"></div>
+
+      <!-- Week Navigator Controls -->
+      <div class="flex items-center justify-between md:justify-end gap-2 shrink-0 border-t md:border-t-0 border-slate-800/80 pt-2.5 md:pt-0">
+        <div class="flex items-center bg-slate-950/90 border border-slate-800 rounded-xl p-1 w-full sm:w-auto justify-between">
+          <button
+            onclick="changeWeek(-1)"
+            class="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 active:scale-95 transition"
+            title="Previous Week"
+          >
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+          </button>
+          <div class="px-3 flex items-center gap-1.5 text-xs font-medium text-slate-200">
+            <svg class="w-3.5 h-3.5 text-indigo-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line>
+              <line x1="8" y1="2" x2="8" y2="6"></line>
+              <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+            <span id="week-range-label"></span>
+          </div>
+          <button
+            id="next-week-btn"
+            onclick="changeWeek(1)"
+            class="p-2 rounded-lg transition"
+            title="Next Week"
+          >
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+        </div>
+
+        <button
+          id="reset-current-week-btn"
+          onclick="resetToCurrentWeek()"
+          class="hidden px-3 py-2 rounded-xl text-xs font-medium bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 hover:bg-indigo-500/25 transition shrink-0"
+        >
+          Current Week
+        </button>
+      </div>
+    </section>
+
+    <!-- MAIN CONTENT GRID: HABIT LOGGING MATRIX + WEEKLY ANALYTICS -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+
+      <!-- LEFT 8 COLUMNS: WEEKLY HABIT MATRIX -->
+      <section class="lg:col-span-8 bg-slate-900/70 backdrop-blur-md border border-slate-800/80 rounded-2xl overflow-hidden shadow-xl">
+        <div class="p-4 sm:p-5 border-b border-slate-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div>
+            <h2 class="text-base font-bold text-white flex items-center gap-2">
+              <span>Weekly Habit Matrix</span>
+              <span id="matrix-habit-count" class="text-xs font-normal text-slate-400"></span>
+            </h2>
+            <p class="text-xs text-slate-400">
+              Tap any day box to log or toggle your daily habit completion.
+            </p>
+          </div>
+          <div class="flex items-center gap-3 text-xs text-slate-400">
+            <span class="flex items-center gap-1.5">
+              <span class="w-3 h-3 rounded-md bg-emerald-500 inline-block"></span> Completed
+            </span>
+            <span class="flex items-center gap-1.5">
+              <span class="w-3 h-3 rounded-md bg-slate-800 border border-slate-700 inline-block"></span> Pending
+            </span>
+          </div>
+        </div>
+
+        <!-- Responsive Habit Matrix Container (Cards on Mobile, Table on Desktop) -->
+        <div id="habit-matrix-body"></div>
+      </section>
+
+      <!-- RIGHT 4 COLUMNS: INTERACTIVE CHARTS & ANALYTICS -->
+      <aside class="lg:col-span-4 space-y-5">
+
+        <!-- 1. Weekly Streak Bar Chart -->
+        <div class="bg-slate-900/70 backdrop-blur-md border border-slate-800/80 rounded-2xl p-4 sm:p-5 shadow-xl">
+          <div class="flex items-center justify-between mb-3.5">
+            <div>
+              <h3 class="text-base font-bold text-white flex items-center gap-2">
+                <svg class="w-4 h-4 text-indigo-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="18" y1="20" x2="18" y2="10"></line>
+                  <line x1="12" y1="20" x2="12" y2="4"></line>
+                  <line x1="6" y1="20" x2="6" y2="14"></line>
+                </svg>
+                <span>Weekly Streak Chart</span>
+              </h3>
+              <p class="text-xs text-slate-400">Daily completion rate across the week</p>
+            </div>
+            <span id="weekly-total-checkins" class="text-xs font-semibold px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300"></span>
+          </div>
+
+          <!-- Interactive Bar Inspection Banner -->
+          <div id="chart-hover-banner" class="h-11 mb-3 px-3 py-2 rounded-xl bg-slate-950/70 border border-slate-800/80 flex items-center justify-between text-xs">
+            <span class="text-slate-400">Tap or hover any bar to inspect daily rate</span>
+          </div>
+
+          <!-- 7-Day Columns -->
+          <div id="weekly-bar-chart" class="h-44 pt-4 pb-2 px-1.5 flex items-end justify-between gap-2 border-b border-slate-800/80"></div>
+
+          <!-- Chart Legend -->
+          <div class="mt-3 flex items-center justify-between text-[11px] text-slate-400">
+            <span class="flex items-center gap-1.5">
+              <span class="w-2.5 h-2.5 rounded-sm bg-emerald-400 inline-block"></span>
+              100% Perfect Day
+            </span>
+            <span class="flex items-center gap-1.5">
+              <span class="w-2.5 h-2.5 rounded-sm bg-indigo-400 inline-block"></span>
+              In Progress
+            </span>
+          </div>
+        </div>
+
+        <!-- 2. Category Adherence Progress -->
+        <div class="bg-slate-900/70 backdrop-blur-md border border-slate-800/80 rounded-2xl p-4 sm:p-5 shadow-xl space-y-4">
+          <div>
+            <h3 class="text-base font-bold text-white flex items-center gap-2">
+              <svg class="w-4 h-4 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                <polyline points="2 17 12 22 22 17"></polyline>
+                <polyline points="2 12 12 17 22 12"></polyline>
+              </svg>
+              <span>Category Adherence</span>
+            </h3>
+            <p class="text-xs text-slate-400">Weekly target completion by life area</p>
+          </div>
+          <div id="category-analytics-list" class="space-y-3.5"></div>
+        </div>
+
+        <!-- 3. Streak Leaderboard -->
+        <div class="bg-slate-900/70 backdrop-blur-md border border-slate-800/80 rounded-2xl p-4 sm:p-5 shadow-xl space-y-3">
+          <div class="flex items-center justify-between">
+            <h3 class="text-base font-bold text-white flex items-center gap-2">
+              <svg class="w-4 h-4 text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>
+              </svg>
+              <span>Streak Leaders</span>
+            </h3>
+            <span class="text-[11px] text-slate-400">Active vs Best</span>
+          </div>
+          <div id="streak-leaders-list" class="space-y-2.5"></div>
+        </div>
+
+      </aside>
+    </div>
+  </main>
+
+  <!-- ========================================== -->
+  <!-- MODAL 1: ADD NEW HABIT                     -->
+  <!-- ========================================== -->
+  <div id="add-habit-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-2xl space-y-5 animate-pop">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-indigo-500/15 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-white">Create New Habit</h3>
+            <p class="text-xs text-slate-400">Set a clear daily action and weekly frequency</p>
+          </div>
+        </div>
+        <button onclick="closeAddModal()" class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <form onsubmit="handleAddHabitSubmit(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
+            Habit Name
+          </label>
+          <input
+            id="new-habit-name"
+            type="text"
+            placeholder="e.g., Read 20 pages, Morning 5k run..."
+            class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+          />
+          <p id="add-habit-error" class="hidden text-xs text-rose-400 mt-1">Please enter a habit name.</p>
+        </div>
+
+        <!-- Emoji Picker -->
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
+            Choose Icon
+          </label>
+          <div id="emoji-picker-grid" class="grid grid-cols-6 gap-2"></div>
+        </div>
+
+        <!-- Category & Weekly Target -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
+              Category
+            </label>
+            <select
+              id="new-habit-category"
+              class="w-full px-3 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-sm text-white focus:outline-none focus:border-indigo-500"
+            >
+              <option value="Health">Health & Fitness</option>
+              <option value="Mindfulness">Mindfulness</option>
+              <option value="Productivity">Productivity</option>
+              <option value="Learning">Growth & Skill</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
+              Weekly Target (<span id="target-days-label">5</span> days/wk)
+            </label>
+            <input
+              id="new-habit-target"
+              type="range"
+              min="1"
+              max="7"
+              value="5"
+              oninput="document.getElementById('target-days-label').textContent = this.value"
+              class="w-full accent-indigo-500 mt-2 cursor-pointer"
+            />
+            <div class="flex justify-between text-[10px] text-slate-400">
+              <span>1d</span>
+              <span>3d</span>
+              <span>5d</span>
+              <span>Every day</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-800">
+          <button
+            type="button"
+            onclick="closeAddModal()"
+            class="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-300 hover:bg-slate-800 transition"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            class="px-5 py-2.5 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-600/25 transition"
+          >
+            Add Habit
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODAL 2: MOBILE PWA INSTALL GUIDE (FA/EN)  -->
+  <!-- ========================================== -->
+  <div id="install-guide-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+    <div dir="rtl" class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-5 sm:p-6 shadow-2xl space-y-5 font-persian animate-pop max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-indigo-500/15 border border-indigo-500/30 flex items-center justify-center text-indigo-400 shrink-0">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+              <line x1="12" y1="18" x2="12.01" y2="18"></line>
+            </svg>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-white">راهنمای نصب روی صفحه اصلی گوشی (PWA)</h3>
+            <p class="text-xs text-slate-400">اجرای تمام‌صفحه و ذخیره اطلاعات روی دستگاه</p>
+          </div>
+        </div>
+        <button onclick="closeInstallModal()" class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="space-y-4 text-xs sm:text-sm leading-relaxed text-slate-200">
+        <!-- Step 1: Hosting -->
+        <div class="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800 space-y-1.5">
+          <div class="flex items-center gap-2 font-bold text-indigo-400">
+            <span class="w-5 h-5 rounded-full bg-indigo-500/20 flex items-center justify-center text-xs">۱</span>
+            <span>مرحله اول: باز کردن لینک در مرورگر گوشی</span>
+          </div>
+          <p class="text-xs text-slate-300">
+            این فایل تک‌صفحه‌ای (<code class="text-indigo-300 font-sans">index.html</code>) را روی یک هاست رایگان مثل <strong>GitHub Pages</strong>، <strong>Netlify Drop</strong> یا <strong>Vercel</strong> قرار دهید و لینک آن را در مرورگر گوشی باز کنید.
+          </p>
+        </div>
+
+        <!-- Step 2: Android Chrome -->
+        <div class="p-3.5 rounded-xl bg-emerald-950/20 border border-emerald-500/25 space-y-2">
+          <div class="flex items-center gap-2 font-bold text-emerald-400">
+            <span class="w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center text-xs">۲</span>
+            <span>نصب در گوشی‌های اندروید (مرورگر Chrome)</span>
+          </div>
+          <ul class="list-disc list-inside space-y-1 text-xs text-slate-300">
+            <li>روی آیکون <strong>سه‌نقطه (⋮)</strong> در گوشه بالا سمت راست کروم بزنید.</li>
+            <li>گزینه <strong>Add to Home screen</strong> یا <strong>Install app</strong> را انتخاب کنید.</li>
+            <li>روی دکمه <strong>Install / Add</strong> بزنید تا آیکون برنامه به صفحه اصلی گوشی اضافه شود.</li>
+          </ul>
+        </div>
+
+        <!-- Step 3: iOS Safari -->
+        <div class="p-3.5 rounded-xl bg-cyan-950/20 border border-cyan-500/25 space-y-2">
+          <div class="flex items-center gap-2 font-bold text-cyan-400">
+            <span class="w-5 h-5 rounded-full bg-cyan-500/20 flex items-center justify-center text-xs">۳</span>
+            <span>نصب در آیفون و آیپد (مرورگر Safari)</span>
+          </div>
+          <ul class="list-disc list-inside space-y-1 text-xs text-slate-300">
+            <li>در نوار پایین سافاری، روی دکمه <strong>Share</strong> (مربع با فلش رو به بالا) بزنید.</li>
+            <li>منو را کمی به پایین اسکرول کنید و گزینه <strong>Add to Home Screen</strong> را بزنید.</li>
+            <li>در بالا سمت راست روی <strong>Add</strong> بزنید تا مثل یک اپ مستقل نصب شود.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-end pt-2 border-t border-slate-800">
+        <button
+          onclick="closeInstallModal()"
+          class="px-5 py-2.5 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white transition"
+        >
+          متوجه شدم (Got it)
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODAL 3: BACKUP, EXPORT & RESTORE DATA     -->
+  <!-- ========================================== -->
+  <div id="backup-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-2xl space-y-5 animate-pop">
+      <div class="flex items-center justify-between">
+        <div>
+          <h3 class="text-base font-bold text-white">Data Backup & Sync</h3>
+          <p class="text-xs text-slate-400">Your habits are saved automatically on this device</p>
+        </div>
+        <button onclick="closeBackupModal()" class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="space-y-3">
+        <!-- Export JSON -->
+        <div class="p-4 rounded-xl bg-slate-950/80 border border-slate-800 flex items-center justify-between gap-3">
+          <div>
+            <h4 class="text-xs font-bold text-white">Export Backup File (.json)</h4>
+            <p class="text-[11px] text-slate-400">Download all habits and streak logs to your phone</p>
+          </div>
+          <button
+            onclick="exportHabitsJson()"
+            class="px-3.5 py-2 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white shrink-0 transition"
+          >
+            Download
+          </button>
+        </div>
+
+        <!-- Import JSON -->
+        <div class="p-4 rounded-xl bg-slate-950/80 border border-slate-800 flex items-center justify-between gap-3">
+          <div>
+            <h4 class="text-xs font-bold text-white">Restore from Backup</h4>
+            <p class="text-[11px] text-slate-400">Load a previously exported JSON backup file</p>
+          </div>
+          <label class="px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 cursor-pointer shrink-0 transition">
+            <span>Import File</span>
+            <input type="file" accept=".json,application/json" onchange="importHabitsJson(event)" class="hidden" />
+          </label>
+        </div>
+
+        <!-- Reset Demo Habits -->
+        <div class="p-4 rounded-xl bg-rose-950/20 border border-rose-500/20 flex items-center justify-between gap-3">
+          <div>
+            <h4 class="text-xs font-bold text-rose-300">Reset to Demo Data</h4>
+            <p class="text-[11px] text-slate-400">Restore original sample habits and streaks</p>
+          </div>
+          <button
+            onclick="handleResetDemoData()"
+            class="px-3.5 py-2 rounded-xl text-xs font-semibold bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/30 shrink-0 transition"
+          >
+            Reset Demo
+          </button>
+        </div>
+      </div>
+
+      <p id="backup-status-msg" class="hidden text-xs text-emerald-400 text-center font-medium"></p>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODAL 4: DELETE HABIT CONFIRMATION         -->
+  <!-- ========================================== -->
+  <div id="delete-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-sm w-full p-5 sm:p-6 shadow-2xl space-y-4 animate-pop">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-rose-500/15 border border-rose-500/30 flex items-center justify-center text-rose-400 shrink-0">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          </svg>
+        </div>
+        <div>
+          <h3 class="text-base font-bold text-white">Remove Habit?</h3>
+          <p class="text-xs text-slate-400">
+            Delete <strong id="delete-habit-title" class="text-slate-200"></strong> and its streak history?
+          </p>
+        </div>
+      </div>
+      <div class="flex items-center justify-end gap-2 pt-2">
+        <button
+          onclick="closeDeleteModal()"
+          class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:bg-slate-800 transition"
+        >
+          Keep Habit
+        </button>
+        <button
+          onclick="confirmDeleteHabit()"
+          class="px-4 py-2 rounded-xl text-xs font-semibold bg-rose-600 hover:bg-rose-500 text-white transition"
+        >
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 5: GOOGLE SIGN-IN + DRIVE BACKUP -->
+  <div id="account-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-2xl space-y-4 animate-pop max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between">
+        <h3 class="text-base font-bold text-white">Account & Drive Backup</h3>
+        <button onclick="closeAccountModal()" class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">✕</button>
+      </div>
+      <div id="acc-guest" class="space-y-3">
+        <p class="text-xs text-slate-400">Sign in with Google to back up your habits to your own Google Drive. Backups are encrypted with a passphrase only you know.</p>
+        <button onclick="googleSignIn()" class="w-full px-4 py-2.5 rounded-xl text-sm font-semibold bg-white hover:bg-slate-100 text-slate-800 flex items-center justify-center gap-2.5">
+          <svg class="w-4 h-4" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.5l6.7-6.7C35.6 2.4 30.2 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.8 6.1C12.3 13.6 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4.1 7.1-10.1 7.1-17.5z"/><path fill="#FBBC05" d="M10.4 28.7c-.5-1.4-.8-3-.8-4.7s.3-3.2.8-4.7l-7.8-6.1C1 16.4 0 20.100 0 24s1 7.600 2.600 10.800l7.800-6.100z"/><path fill="#34A853" d="M24 48c6.200 0 11.500-2 15.300-5.600l-7.500-5.800c-2.100 1.400-4.700 2.200-7.800 2.200-6.300 0-11.700-4.100-13.600-9.800l-7.800 6.100C6.500 42.600 14.600 48 24 48z"/></svg>
+          <span>Sign in with Google</span>
+        </button>
+      </div>
+      <div id="acc-user" class="hidden space-y-3">
+        <div class="p-3 rounded-xl bg-slate-950/80 border border-slate-800 flex items-center justify-between gap-2">
+          <div class="min-w-0"><p class="text-sm text-white font-semibold truncate" id="acc-current"></p><p class="text-[11px] text-slate-400 truncate" id="acc-email"></p></div>
+          <button onclick="accSignOut()" class="px-3 py-1.5 rounded-lg text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 shrink-0">Sign out</button>
+        </div>
+        <div class="p-3 rounded-xl bg-slate-950/80 border border-slate-800 space-y-2">
+          <h4 class="text-xs font-bold text-white">Google Drive backup</h4>
+          <p class="text-[11px] text-slate-400">Stored in a hidden app folder only this app can access. Auto-backup runs when you are online.</p>
+          <p class="text-[11px] text-slate-400">Your passphrase encrypts the backup on this device before upload. Google cannot read it, and it cannot be recovered if forgotten.</p>
+          <input id="acc-sync-pass" type="password" placeholder="Backup passphrase (min 6 chars)" class="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-800 text-xs text-white focus:outline-none focus:border-indigo-500" />
+          <div class="flex gap-2">
+            <button onclick="driveConnect()" class="flex-1 px-3 py-2 rounded-lg text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white">Connect & backup</button>
+            <button onclick="driveRestore()" class="flex-1 px-3 py-2 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200">Restore</button>
+          </div>
+          <p id="drive-status" class="text-[11px] text-slate-400"></p>
+        </div>
+      </div>
+      <p id="acc-msg" class="hidden text-xs text-rose-400 text-center"></p>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- APPLICATION LOGIC & PWA BOOTSTRAP          -->
+  <!-- ========================================== -->
+  <script>
+    // --- 1. SERVICE WORKER (real file: ./sw.js — works only over https:// or localhost) ---
+    // Offline support is best-effort and NOT guaranteed: it depends on the browser and on the
+    // external CDN files (Tailwind/Fonts) having been cached by a previous online visit.
+    if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+      window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
+    }
+
+    // Handle native beforeinstallprompt on Android Chrome
+    let deferredInstallPrompt = null;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredInstallPrompt = e;
+      const banner = document.getElementById('native-install-banner');
+      if (banner) {
+        banner.classList.remove('hidden');
+        banner.classList.add('flex');
+      }
+    });
+
+    async function triggerNativeInstall() {
+      if (!deferredInstallPrompt) {
+        openInstallModal();
+        return;
+      }
+      deferredInstallPrompt.prompt();
+      await deferredInstallPrompt.userChoice;
+      deferredInstallPrompt = null;
+      const banner = document.getElementById('native-install-banner');
+      if (banner) banner.classList.add('hidden');
+    }
+
+    // --- 2. CONSTANTS & STATE ---
+    const STORAGE_KEY = 'habitflow_data_v1';
+
+    const CATEGORIES = [
+      { id: 'All', name: 'All Habits', bg: 'bg-indigo-500/10', text: 'text-indigo-400', border: 'border-indigo-500/30', dot: 'bg-indigo-400' },
+      { id: 'Health', name: 'Health & Fitness', bg: 'bg-emerald-500/10', text: 'text-emerald-400', border: 'border-emerald-500/30', dot: 'bg-emerald-400' },
+      { id: 'Mindfulness', name: 'Mindfulness', bg: 'bg-violet-500/10', text: 'text-violet-400', border: 'border-violet-500/30', dot: 'bg-violet-400' },
+      { id: 'Productivity', name: 'Productivity', bg: 'bg-amber-500/10', text: 'text-amber-400', border: 'border-amber-500/30', dot: 'bg-amber-400' },
+      { id: 'Learning', name: 'Growth & Skill', bg: 'bg-cyan-500/10', text: 'text-cyan-400', border: 'border-cyan-500/30', dot: 'bg-cyan-400' }
+    ];
+
+    const EMOJI_OPTIONS = ['💧', '🏃', '🧘', '📚', '💻', '🥗', '🎸', '💤', '✍️', '🧠', '🏋️', '🍵'];
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    let state = {
+      habits: [],
+      selectedCategory: 'All',
+      weekOffset: 0,
+      selectedEmoji: '💧',
+      habitIdToDelete: null,
+      inspectedDayKey: null
+    };
+
+    // --- 3. DATE & STREAK HELPERS ---
+    function formatDateKey(date) {
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, '0');
+      const d = String(date.getDate()).padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    }
+
+    function parseDateKey(key) {
+      const [y, m, d] = key.split('-').map(Number);
+      return new Date(y, m - 1, d);
+    }
+
+    function getWeekDays(baseDate, weekOffset = 0) {
+      const d = new Date(baseDate);
+      d.setHours(0, 0, 0, 0);
+      d.setDate(d.getDate() + weekOffset * 7);
+
+      const dayOfWeek = d.getDay(); // 0 (Sun) to 6 (Sat)
+      const diffToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+      const monday = new Date(d);
+      monday.setDate(d.getDate() + diffToMonday);
+
+      return Array.from({ length: 7 }, (_, i) => {
+        const day = new Date(monday);
+        day.setDate(monday.getDate() + i);
+        return day;
+      });
+    }
+
+    function calculateHabitStreaks(completedDates = {}, todayDate) {
+      const todayKey = formatDateKey(todayDate);
+      const yesterday = new Date(todayDate);
+      yesterday.setDate(yesterday.getDate() - 1);
+      const yesterdayKey = formatDateKey(yesterday);
+
+      let currentStreak = 0;
+      let checkDate = new Date(todayDate);
+
+      if (completedDates[todayKey]) {
+        while (completedDates[formatDateKey(checkDate)]) {
+          currentStreak++;
+          checkDate.setDate(checkDate.getDate() - 1);
+        }
+      } else if (completedDates[yesterdayKey]) {
+        checkDate = yesterday;
+        while (completedDates[formatDateKey(checkDate)]) {
+          currentStreak++;
+          checkDate.setDate(checkDate.getDate() - 1);
+        }
+      }
+
+      const sortedKeys = Object.keys(completedDates)
+        .filter((k) => completedDates[k])
+        .sort();
+
+      let longestStreak = 0;
+      let tempStreak = 0;
+      let prevDate = null;
+
+      for (const key of sortedKeys) {
+        const currDate = parseDateKey(key);
+        if (!prevDate) {
+          tempStreak = 1;
+        } else {
+          const diffDays = Math.round((currDate - prevDate) / (1000 * 60 * 60 * 24));
+          if (diffDays === 1) {
+            tempStreak++;
+          } else if (diffDays > 1) {
+            tempStreak = 1;
+          }
+        }
+        if (tempStreak > longestStreak) {
+          longestStreak = tempStreak;
+        }
+        prevDate = currDate;
+      }
+
+      return { currentStreak, longestStreak };
+    }
+
+    function generateInitialHabits(baseToday) {
+      const getPastKey = (daysAgo) => {
+        const d = new Date(baseToday);
+        d.setDate(d.getDate() - daysAgo);
+        return formatDateKey(d);
+      };
+
+      return [
+        {
+          id: 'h-1',
+          name: 'Morning Hydration (500ml)',
+          category: 'Health',
+          icon: '💧',
+          targetPerWeek: 7,
+          completedDates: {
+            [getPastKey(0)]: true,
+            [getPastKey(1)]: true,
+            [getPastKey(2)]: true,
+            [getPastKey(3)]: true,
+            [getPastKey(4)]: true,
+            [getPastKey(5)]: true,
+            [getPastKey(6)]: true,
+            [getPastKey(7)]: true,
+            [getPastKey(8)]: true
+          }
+        },
+        {
+          id: 'h-2',
+          name: 'Deep Work Session (90m)',
+          category: 'Productivity',
+          icon: '💻',
+          targetPerWeek: 5,
+          completedDates: {
+            [getPastKey(0)]: true,
+            [getPastKey(1)]: true,
+            [getPastKey(2)]: true,
+            [getPastKey(4)]: true,
+            [getPastKey(5)]: true,
+            [getPastKey(7)]: true,
+            [getPastKey(8)]: true,
+            [getPastKey(9)]: true
+          }
+        },
+        {
+          id: 'h-3',
+          name: '15m Mindfulness Meditation',
+          category: 'Mindfulness',
+          icon: '🧘',
+          targetPerWeek: 7,
+          completedDates: {
+            [getPastKey(1)]: true,
+            [getPastKey(2)]: true,
+            [getPastKey(3)]: true,
+            [getPastKey(4)]: true,
+            [getPastKey(6)]: true
+          }
+        },
+        {
+          id: 'h-4',
+          name: 'Read 20 Pages Non-Fiction',
+          category: 'Learning',
+          icon: '📚',
+          targetPerWeek: 5,
+          completedDates: {
+            [getPastKey(0)]: true,
+            [getPastKey(1)]: true,
+            [getPastKey(3)]: true,
+            [getPastKey(5)]: true,
+            [getPastKey(6)]: true
+          }
+        },
+        {
+          id: 'h-5',
+          name: 'Strength or Zone 2 Cardio',
+          category: 'Health',
+          icon: '🏋️',
+          targetPerWeek: 4,
+          completedDates: {
+            [getPastKey(0)]: true,
+            [getPastKey(2)]: true,
+            [getPastKey(4)]: true,
+            [getPastKey(6)]: true
+          }
+        }
+      ];
+    }
+
+    // --- 4. STORAGE PERSISTENCE ---
+    function loadHabits() {
+      try {
+        const raw = localStorage.getItem(habitsKey());
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            state.habits = sanitizeHabits(parsed);
+            return;
+          }
+        }
+      } catch (e) {
+        console.error('Error loading habits:', e);
+      }
+      state.habits = generateInitialHabits(today);
+      saveHabits();
+    }
+
+    function saveHabits() {
+      try {
+        localStorage.setItem(habitsKey(), JSON.stringify(state.habits));
+        markDirty();
+      } catch (e) {
+        console.error('Error saving habits:', e);
+      }
+    }
+
+    // --- 5. DATA COMPUTATION & RENDERING ---
+    function getCategoryTheme(catId) {
+      return CATEGORIES.find((c) => c.id === catId) || CATEGORIES[0];
+    }
+
+    function renderApp() { _renderApp(); applyLang(); }
+    function _renderApp() {
+      const todayKey = formatDateKey(today);
+      const currentWeekDays = getWeekDays(today, state.weekOffset);
+
+      // Header Date
+      document.getElementById('header-today-date').textContent = today.toLocaleDateString(LOC(), {
+        weekday: 'long',
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric'
+      });
+
+      // Enrich Habits
+      const enrichedHabits = state.habits.map((habit) => {
+        const { currentStreak, longestStreak } = calculateHabitStreaks(habit.completedDates, today);
+        let weeklyCompletedCount = 0;
+        currentWeekDays.forEach((day) => {
+          if (habit.completedDates[formatDateKey(day)]) weeklyCompletedCount++;
+        });
+        const weeklyProgressPct = Math.min(
+          100,
+          Math.round((weeklyCompletedCount / (habit.targetPerWeek || 7)) * 100)
+        );
+        return {
+          ...habit,
+          currentStreak,
+          longestStreak,
+          weeklyCompletedCount,
+          weeklyProgressPct
+        };
+      });
+
+      const filteredHabits = state.selectedCategory === 'All'
+        ? enrichedHabits
+        : enrichedHabits.filter((h) => h.category === state.selectedCategory);
+
+      // Compute Analytics
+      const totalHabitsCount = filteredHabits.length;
+      let completedToday = 0;
+      filteredHabits.forEach((h) => {
+        if (h.completedDates[todayKey]) completedToday++;
+      });
+      const todayPct = totalHabitsCount > 0 ? Math.round((completedToday / totalHabitsCount) * 100) : 0;
+
+      const dailyStats = currentWeekDays.map((dateObj) => {
+        const key = formatDateKey(dateObj);
+        const isFuture = dateObj > today;
+        const isToday = key === todayKey;
+        let count = 0;
+        filteredHabits.forEach((h) => {
+          if (h.completedDates[key]) count++;
+        });
+        const pct = totalHabitsCount > 0 ? Math.round((count / totalHabitsCount) * 100) : 0;
+        return {
+          date: dateObj,
+          key,
+          dayShort: dateObj.toLocaleDateString(LOC(), { weekday: 'short' }),
+          dayNum: dateObj.getDate(),
+          monthShort: dateObj.toLocaleDateString(LOC(), { month: 'short' }),
+          count,
+          total: totalHabitsCount,
+          pct,
+          isFuture,
+          isToday
+        };
+      });
+
+      const totalWeeklyCompletions = dailyStats.reduce((sum, d) => sum + d.count, 0);
+      const totalWeeklyTargets = filteredHabits.reduce((sum, h) => sum + (h.targetPerWeek || 7), 0);
+      const weeklyGoalPct = totalWeeklyTargets > 0
+        ? Math.min(100, Math.round((totalWeeklyCompletions / totalWeeklyTargets) * 100))
+        : 0;
+
+      const maxCurrentStreak = filteredHabits.reduce((max, h) => Math.max(max, h.currentStreak), 0);
+      const maxAllTimeStreak = filteredHabits.reduce((max, h) => Math.max(max, h.longestStreak), 0);
+      const bestStreakHabit = filteredHabits.find((h) => h.currentStreak === maxCurrentStreak && maxCurrentStreak > 0);
+
+      // Render Week Range Label
+      const firstDay = currentWeekDays[0];
+      const lastDay = currentWeekDays[6];
+      const sameMonth = firstDay.getMonth() === lastDay.getMonth();
+      const weekRangeStr = `${firstDay.toLocaleDateString(LOC(), { month: 'short', day: 'numeric' })} – ${lastDay.toLocaleDateString(LOC(), { month: 'short', day: 'numeric', year: 'numeric' })}`;
+
+      document.getElementById('week-range-label').textContent = weekRangeStr;
+
+      // Update Week Navigation Buttons
+      const nextBtn = document.getElementById('next-week-btn');
+      if (state.weekOffset >= 0) {
+        nextBtn.disabled = true;
+        nextBtn.className = 'p-2 rounded-lg text-slate-700 cursor-not-allowed';
+      } else {
+        nextBtn.disabled = false;
+        nextBtn.className = 'p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 active:scale-95 transition';
+      }
+
+      const resetWeekBtn = document.getElementById('reset-current-week-btn');
+      if (state.weekOffset !== 0) {
+        resetWeekBtn.classList.remove('hidden');
+      } else {
+        resetWeekBtn.classList.add('hidden');
+      }
+
+      // 1. Render KPI Cards
+      renderKPICards({
+        completedToday,
+        totalHabitsCount,
+        todayPct,
+        maxCurrentStreak,
+        bestStreakHabit,
+        maxAllTimeStreak,
+        weeklyGoalPct,
+        totalWeeklyCompletions,
+        totalWeeklyTargets,
+        weekRangeStr
+      });
+
+      // 2. Render Category Filter Pills
+      renderCategoryPills();
+
+      // 3. Render Habit Matrix
+      renderHabitMatrix(filteredHabits, currentWeekDays, todayKey);
+
+      // 4. Render Weekly Bar Chart
+      renderWeeklyChart(dailyStats, totalWeeklyCompletions);
+
+      // 5. Render Category Adherence
+      renderCategoryAnalytics(enrichedHabits);
+
+      // 6. Render Streak Leaders
+      renderStreakLeaders(enrichedHabits);
+    }
+
+    function renderKPICards(metrics) {
+      const circumference = 2 * Math.PI * 20;
+      const dashOffset = circumference * (1 - metrics.todayPct / 100);
+
+      document.getElementById('kpi-cards-container').innerHTML = `
+        <!-- Today's Focus -->
+        <div class="bg-slate-900/70 backdrop-blur-md border border-slate-800/80 rounded-2xl p-4 sm:p-5 flex items-center justify-between">
+          <div class="space-y-1 min-w-0">
+            <span class="text-[11px] sm:text-xs font-medium text-slate-400 flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-indigo-400"></span>
+              Today's Focus
+            </span>
+            <div class="flex items-baseline gap-1.5">
+              <p class="text-xl sm:text-2xl font-bold text-white">
+                ${nf(metrics.completedToday)}<span class="text-slate-500 text-sm sm:text-base font-medium">/${nf(metrics.totalHabitsCount)}</span>
+              </p>
+              <span class="text-[11px] font-semibold text-indigo-400 bg-indigo-500/10 px-1.5 py-0.5 rounded-md">
+                ${nf(metrics.todayPct)}%
+              </span>
+            </div>
+            <p class="text-[11px] text-slate-400 truncate">
+              ${metrics.todayPct === 100 && metrics.totalHabitsCount > 0 ? tr('All daily goals done! 🎉') : `${nf(Math.max(0, metrics.totalHabitsCount - metrics.completedToday))} ${tr('left for today')}`}
+            </p>
+          </div>
+          <div class="relative w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center shrink-0">
+            <svg class="w-12 h-12 sm:w-14 sm:h-14 -rotate-90" viewBox="0 0 48 48">
+              <circle cx="24" cy="24" r="20" fill="none" stroke="currentColor" stroke-width="4.5" class="text-slate-800" />
+              <circle cx="24" cy="24" r="20" fill="none" stroke="currentColor" stroke-width="4.5"
+                stroke-dasharray="${circumference}"
+                stroke-dashoffset="${dashOffset}"
+                stroke-linecap="round"
+                class="text-indigo-500 transition-all duration-500" />
+            </svg>
+            <svg class="w-4 h-4 absolute ${metrics.todayPct === 100 ? 'text-emerald-400' : 'text-slate-400'}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Top Active Streak -->
+        <div class="bg-slate-900/70 backdrop-blur-md border border-slate-800/80 rounded-2xl p-4 sm:p-5 flex items-center justify-between">
+          <div class="space-y-1 min-w-0">
+            <span class="text-[11px] sm:text-xs font-medium text-slate-400 flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+              Active Streak
+            </span>
+            <p class="text-xl sm:text-2xl font-bold text-white">
+              ${nf(metrics.maxCurrentStreak)} <span class="text-xs sm:text-sm font-normal text-slate-400">${tr('days')}</span>
+            </p>
+            <p class="text-[11px] text-slate-400 truncate">
+              ${metrics.bestStreakHabit ? `${metrics.bestStreakHabit.icon} ${tr(metrics.bestStreakHabit.name)}` : tr('Check in today!')}
+            </p>
+          </div>
+          <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center shrink-0 text-amber-400">
+            <svg class="w-5 h-5 sm:w-6 sm:h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- All-Time Best Streak -->
+        <div class="bg-slate-900/70 backdrop-blur-md border border-slate-800/80 rounded-2xl p-4 sm:p-5 flex items-center justify-between">
+          <div class="space-y-1 min-w-0">
+            <span class="text-[11px] sm:text-xs font-medium text-slate-400 flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+              All-Time Best
+            </span>
+            <p class="text-xl sm:text-2xl font-bold text-white">
+              ${nf(metrics.maxAllTimeStreak)} <span class="text-xs sm:text-sm font-normal text-slate-400">${tr('days')}</span>
+            </p>
+            <p class="text-[11px] text-slate-400 truncate">${tr('Personal record')}</p>
+          </div>
+          <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center shrink-0 text-emerald-400">
+            <svg class="w-5 h-5 sm:w-6 sm:h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="8" r="7"></circle>
+              <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Weekly Target Rate -->
+        <div class="bg-slate-900/70 backdrop-blur-md border border-slate-800/80 rounded-2xl p-4 sm:p-5 flex items-center justify-between">
+          <div class="space-y-1 min-w-0">
+            <span class="text-[11px] sm:text-xs font-medium text-slate-400 flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+              Weekly Goal
+            </span>
+            <div class="flex items-baseline gap-1.5">
+              <p class="text-xl sm:text-2xl font-bold text-white">${nf(metrics.weeklyGoalPct)}%</p>
+              <span class="text-[11px] text-slate-400">(${nf(metrics.totalWeeklyCompletions)}/${nf(metrics.totalWeeklyTargets)})</span>
+            </div>
+            <p class="text-[11px] text-slate-400 truncate">${state.weekOffset === 0 ? tr('Current week pace') : metrics.weekRangeStr}</p>
+          </div>
+          <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center shrink-0 text-cyan-400">
+            <svg class="w-5 h-5 sm:w-6 sm:h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+            </svg>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderCategoryPills() {
+      const container = document.getElementById('category-pills-container');
+      container.innerHTML = CATEGORIES.map((cat) => {
+        const isSelected = state.selectedCategory === cat.id;
+        const count = cat.id === 'All'
+          ? state.habits.length
+          : state.habits.filter((h) => h.category === cat.id).length;
+
+        return `
+          <button
+            onclick="selectCategory('${cat.id}')"
+            class="px-3 py-1.5 rounded-xl text-xs font-medium transition flex items-center gap-1.5 shrink-0 active:scale-95 ${
+              isSelected
+                ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20'
+                : 'bg-slate-800/80 text-slate-300 hover:bg-slate-800 hover:text-white'
+            }"
+          >
+            ${cat.id !== 'All' ? `<span class="w-2 h-2 rounded-full ${cat.dot}"></span>` : ''}
+            <span>${tr(cat.name)}</span>
+            <span class="px-1.5 py-0.2 rounded-full text-[10px] ${
+              isSelected ? 'bg-indigo-700 text-indigo-100' : 'bg-slate-700/70 text-slate-400'
+            }">${count}</span>
+          </button>
+        `;
+      }).join('');
+    }
+
+    function renderHabitMatrix(filteredHabits, currentWeekDays, todayKey) {
+      document.getElementById('matrix-habit-count').textContent = `(${nf(filteredHabits.length)} ${tr(filteredHabits.length === 1 ? 'habit' : 'habits')})`;
+      const container = document.getElementById('habit-matrix-body');
+
+      if (filteredHabits.length === 0) {
+        container.innerHTML = `
+          <div class="p-10 text-center space-y-3">
+            <div class="w-12 h-12 rounded-2xl bg-slate-800/80 border border-slate-700 mx-auto flex items-center justify-center text-indigo-400">
+              <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+            </div>
+            <h3 class="text-sm font-semibold text-white">${tr('No habits in this category')}</h3>
+            <p class="text-xs text-slate-400 max-w-xs mx-auto">${tr('Add a new daily habit to start tracking your weekly consistency.')}</p>
+            <button onclick="openAddModal()" class="px-4 py-2 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white transition">
+              ${tr('+ Create Habit')}
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      // Mobile-First Card Layout (<640px) + Desktop Table (>=640px)
+      const mobileCardsHtml = `
+        <div class="sm:hidden divide-y divide-slate-800/70">
+          ${filteredHabits.map((habit) => {
+            const catTheme = getCategoryTheme(habit.category);
+            const goalReached = habit.weeklyCompletedCount >= habit.targetPerWeek;
+
+            return `
+              <div class="p-4 space-y-3">
+                <div class="flex items-start justify-between gap-2">
+                  <div class="flex items-center gap-2.5 min-w-0">
+                    <div class="w-10 h-10 rounded-xl bg-slate-800/90 border border-slate-700/70 flex items-center justify-center text-lg shrink-0">
+                      ${habit.icon || '✨'}
+                    </div>
+                    <div class="min-w-0">
+                      <p class="text-sm font-semibold text-slate-100 truncate">${escapeHtml(tr(habit.name))}</p>
+                      <div class="flex items-center gap-2 mt-0.5">
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-medium border ${catTheme.bg} ${catTheme.text} ${catTheme.border}">
+                          <span class="w-1.5 h-1.5 rounded-full ${catTheme.dot}"></span>
+                          ${tr(getCategoryTheme(habit.category).name)}
+                        </span>
+                        <span class="text-[11px] font-medium ${goalReached ? 'text-emerald-400' : 'text-slate-400'}">
+                          ${nf(habit.weeklyCompletedCount)}/${nf(habit.targetPerWeek)}${tr('d')} ${tr('goal')}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="flex items-center gap-1.5 shrink-0">
+                    <div class="px-2 py-1 rounded-lg text-xs font-bold flex items-center gap-1 ${
+                      habit.currentStreak > 0
+                        ? 'bg-amber-500/15 text-amber-300 border border-amber-500/30'
+                        : 'bg-slate-800 text-slate-400'
+                    }">
+                      <span>🔥</span>
+                      <span>${nf(habit.currentStreak)}${tr('d')}</span>
+                    </div>
+                    <button onclick="openDeleteModal('${habit.id}')" class="p-1.5 rounded-lg text-slate-500 hover:text-rose-400">
+                      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- 7-Day Touch Row for Mobile -->
+                <div class="grid grid-cols-7 gap-1.5 pt-1">
+                  ${currentWeekDays.map((day) => {
+                    const key = formatDateKey(day);
+                    const isCompleted = !!habit.completedDates[key];
+                    const isToday = key === todayKey;
+                    const isFuture = day > today;
+                    const dayLabel = day.toLocaleDateString(LOC(), { weekday: 'narrow' });
+
+                    return `
+                      <button
+                        type="button"
+                        onclick="toggleHabitCompletion('${habit.id}', '${key}')"
+                        class="flex flex-col items-center py-2 rounded-xl border transition active:scale-90 ${
+                          isCompleted
+                            ? 'bg-gradient-to-b from-emerald-500 to-emerald-600 border-emerald-400 text-slate-950 shadow-sm shadow-emerald-500/20'
+                            : isToday
+                            ? 'bg-indigo-500/10 border-indigo-500/60 text-slate-200'
+                            : isFuture
+                            ? 'bg-slate-900/40 border-slate-800/60 text-slate-600'
+                            : 'bg-slate-800/60 border-slate-700/60 text-slate-300'
+                        }"
+                      >
+                        <span class="text-[10px] font-semibold uppercase opacity-80">${dayLabel}</span>
+                        <span class="text-xs font-bold mt-0.5">${nf(day.getDate())}</span>
+                        <span class="mt-1 w-4 h-4 rounded-full flex items-center justify-center ${
+                          isCompleted ? 'bg-slate-950/20 text-white' : ''
+                        }">
+                          ${isCompleted ? '✓' : '·'}
+                        </span>
+                      </button>
+                    `;
+                  }).join('')}
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      `;
+
+      const desktopTableHtml = `
+        <div class="hidden sm:block overflow-x-auto custom-scrollbar">
+          <table class="w-full text-left border-collapse min-w-[660px]">
+            <thead>
+              <tr class="border-b border-slate-800/80 bg-slate-950/40">
+                <th class="py-3.5 pl-5 pr-3 text-xs font-semibold uppercase tracking-wider text-slate-400 w-[240px]">
+                  Habit & Category
+                </th>
+                ${currentWeekDays.map((day) => {
+                  const key = formatDateKey(day);
+                  const isToday = key === todayKey;
+                  return `
+                    <th class="py-3 px-1.5 text-center w-12 ${isToday ? 'bg-indigo-500/10' : ''}">
+                      <div class="flex flex-col items-center">
+                        <span class="text-[10px] font-semibold uppercase tracking-wider ${isToday ? 'text-indigo-400' : 'text-slate-400'}">
+                          ${day.toLocaleDateString(LOC(), { weekday: 'short' })}
+                        </span>
+                        <span class="mt-1 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${
+                          isToday ? 'bg-indigo-500 text-white shadow-sm shadow-indigo-500/50' : 'text-slate-200'
+                        }">
+                          ${nf(day.getDate())}
+                        </span>
+                      </div>
+                    </th>
+                  `;
+                }).join('')}
+                <th class="py-3.5 px-3 text-center text-xs font-semibold uppercase tracking-wider text-slate-400">
+                  Weekly Goal
+                </th>
+                <th class="py-3.5 px-3 text-center text-xs font-semibold uppercase tracking-wider text-slate-400">
+                  Streak
+                </th>
+                <th class="py-3.5 pl-2 pr-4 text-right w-10"></th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-800/60">
+              ${filteredHabits.map((habit) => {
+                const catTheme = getCategoryTheme(habit.category);
+                const goalReached = habit.weeklyCompletedCount >= habit.targetPerWeek;
+
+                return `
+                  <tr class="group hover:bg-slate-800/30 transition-colors">
+                    <td class="py-3.5 pl-5 pr-3">
+                      <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-slate-800/90 border border-slate-700/70 flex items-center justify-center text-lg shrink-0">
+                          ${habit.icon || '✨'}
+                        </div>
+                        <div class="min-w-0">
+                          <p class="text-sm font-semibold text-slate-100 truncate">${escapeHtml(tr(habit.name))}</p>
+                          <div class="flex items-center gap-2 mt-1">
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-medium border ${catTheme.bg} ${catTheme.text} ${catTheme.border}">
+                              <span class="w-1.5 h-1.5 rounded-full ${catTheme.dot}"></span>
+                              ${tr(getCategoryTheme(habit.category).name)}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+
+                    ${currentWeekDays.map((day) => {
+                      const key = formatDateKey(day);
+                      const isCompleted = !!habit.completedDates[key];
+                      const isToday = key === todayKey;
+                      const isFuture = day > today;
+
+                      return `
+                        <td class="py-3 px-1.5 text-center ${isToday ? 'bg-indigo-500/5' : ''}">
+                          <button
+                            type="button"
+                            onclick="toggleHabitCompletion('${habit.id}', '${key}')"
+                            class="w-9 h-9 rounded-xl mx-auto flex items-center justify-center transition-all duration-150 active:scale-90 ${
+                              isCompleted
+                                ? 'bg-gradient-to-br from-emerald-400 to-emerald-600 text-slate-950 shadow-md shadow-emerald-500/25 hover:brightness-110'
+                                : isFuture
+                                ? 'bg-slate-900/50 border border-slate-800/70 text-transparent hover:border-slate-700'
+                                : isToday
+                                ? 'bg-slate-800/90 border-2 border-indigo-500/50 text-transparent hover:border-indigo-400'
+                                : 'bg-slate-800/70 border border-slate-700/70 text-transparent hover:border-slate-500'
+                            }"
+                          >
+                            <svg class="w-4 h-4 stroke-[3] ${isCompleted ? 'scale-100' : 'scale-0'} transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                              <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                          </button>
+                        </td>
+                      `;
+                    }).join('')}
+
+                    <td class="py-3.5 px-3 text-center">
+                      <div class="flex flex-col items-center gap-1">
+                        <div class="flex items-center gap-1 text-xs font-semibold">
+                          <span class="${goalReached ? 'text-emerald-400' : 'text-slate-200'}">${habit.weeklyCompletedCount}</span>
+                          <span class="text-slate-500">/</span>
+                          <span class="text-slate-400">${nf(habit.targetPerWeek)}${tr('d')}</span>
+                        </div>
+                        <div class="w-16 h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                          <div class="h-full rounded-full transition-all duration-300 ${goalReached ? 'bg-emerald-400' : 'bg-indigo-500'}" style="width: ${habit.weeklyProgressPct}%"></div>
+                        </div>
+                      </div>
+                    </td>
+
+                    <td class="py-3.5 px-3 text-center">
+                      <div class="inline-flex flex-col items-center">
+                        <div class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold ${
+                          habit.currentStreak > 0
+                            ? 'bg-amber-500/15 text-amber-300 border border-amber-500/30'
+                            : 'bg-slate-800/70 text-slate-400'
+                        }">
+                          <span>🔥</span>
+                          <span>${nf(habit.currentStreak)}${tr('d')}</span>
+                        </div>
+                        <span class="text-[10px] text-slate-400 mt-0.5">${tr('Best:')} ${nf(habit.longestStreak)}${tr('d')}</span>
+                      </div>
+                    </td>
+
+                    <td class="py-3.5 pl-2 pr-4 text-right">
+                      <button
+                        onclick="openDeleteModal('${habit.id}')"
+                        class="p-2 rounded-lg text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 transition"
+                        title="Delete Habit"
+                      >
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <polyline points="3 6 5 6 21 6"></polyline>
+                          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                        </svg>
+                      </button>
+                    </td>
+                  </tr>
+                `;
+              }).join('')}
+            </tbody>
+          </table>
+        </div>
+      `;
+
+      container.innerHTML = mobileCardsHtml + desktopTableHtml;
+    }
+
+    function renderWeeklyChart(dailyStats, totalWeeklyCompletions) {
+      document.getElementById('weekly-total-checkins').textContent = `${nf(totalWeeklyCompletions)} ${tr('check-ins')}`;
+      window.__currentDailyStats = dailyStats;
+
+      const chartEl = document.getElementById('weekly-bar-chart');
+      chartEl.innerHTML = dailyStats.map((dayStat) => {
+        const barHeightPct = Math.max(dayStat.pct, 6);
+        const isPerfect = dayStat.pct === 100 && dayStat.total > 0;
+
+        return `
+          <div
+            onmouseenter="inspectChartDay('${dayStat.key}')"
+            onclick="inspectChartDay('${dayStat.key}')"
+            class="flex-1 flex flex-col items-center h-full justify-end group cursor-pointer select-none"
+          >
+            <span class="text-[10px] font-bold mb-1.5 ${
+              dayStat.isToday ? 'text-white' : 'text-slate-400 group-hover:text-white'
+            }">
+              ${nf(dayStat.pct)}%
+            </span>
+            <div class="w-full max-w-[34px] h-28 bg-slate-950/90 rounded-xl p-1 flex items-end border border-slate-800/80 group-hover:border-slate-600 transition">
+              <div
+                class="w-full rounded-lg transition-all duration-500 ${
+                  dayStat.pct === 0
+                    ? 'bg-slate-800'
+                    : isPerfect
+                    ? 'bg-gradient-to-t from-emerald-600 to-emerald-400 shadow-lg shadow-emerald-500/20'
+                    : dayStat.isToday
+                    ? 'bg-gradient-to-t from-indigo-600 to-indigo-400 shadow-lg shadow-indigo-500/20'
+                    : 'bg-gradient-to-t from-indigo-600/80 to-violet-400/80'
+                }"
+                style="height: ${barHeightPct}%"
+              ></div>
+            </div>
+            <span class="mt-2 text-[11px] font-semibold ${dayStat.isToday ? 'text-indigo-400' : 'text-slate-400'}">
+              ${dayStat.dayShort}
+            </span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function inspectChartDay(dayKey) {
+      const stats = window.__currentDailyStats || [];
+      const found = stats.find((d) => d.key === dayKey);
+      const banner = document.getElementById('chart-hover-banner');
+      if (!found || !banner) return;
+
+      banner.innerHTML = `
+        <div class="flex items-center gap-2">
+          <span class="font-semibold text-white">${found.dayShort}, ${found.monthShort} ${found.dayNum}</span>
+          ${found.isToday ? `<span class="px-1.5 py-0.5 text-[10px] rounded bg-indigo-500/20 text-indigo-300">${tr('Today')}</span>` : ''}
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-slate-400">${nf(found.count)}/${nf(found.total)} ${tr('habits')}</span>
+          <span class="font-bold text-emerald-400">${found.pct}%</span>
+        </div>
+      `;
+    }
+
+    function renderCategoryAnalytics(enrichedHabits) {
+      const container = document.getElementById('category-analytics-list');
+      const catStats = CATEGORIES.filter((c) => c.id !== 'All').map((cat) => {
+        const catHabits = enrichedHabits.filter((h) => h.category === cat.id);
+        const possible = catHabits.reduce((sum, h) => sum + (h.targetPerWeek || 7), 0);
+        const done = catHabits.reduce((sum, h) => sum + h.weeklyCompletedCount, 0);
+        const pct = possible > 0 ? Math.min(100, Math.round((done / possible) * 100)) : 0;
+        return { ...cat, habitCount: catHabits.length, done, possible, pct };
+      });
+
+      container.innerHTML = catStats.map((cat) => `
+        <div class="space-y-1.5">
+          <div class="flex items-center justify-between text-xs">
+            <button
+              onclick="selectCategory('${state.selectedCategory === cat.id ? 'All' : cat.id}')"
+              class="flex items-center gap-2 font-medium text-slate-200 hover:text-white transition"
+            >
+              <span class="w-2.5 h-2.5 rounded-full ${cat.dot}"></span>
+              <span>${tr(cat.name)}</span>
+              <span class="text-[11px] text-slate-400">(${cat.habitCount})</span>
+            </button>
+            <div class="flex items-center gap-2">
+              <span class="text-slate-400 text-[11px]">${nf(cat.done)}/${nf(cat.possible)}</span>
+              <span class="font-semibold text-slate-200 w-9 text-end">${nf(cat.pct)}%</span>
+            </div>
+          </div>
+          <div class="w-full h-2 bg-slate-950 rounded-full overflow-hidden border border-slate-800/80">
+            <div class="h-full rounded-full transition-all duration-500 ${cat.dot}" style="width: ${cat.pct}%"></div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderStreakLeaders(enrichedHabits) {
+      const container = document.getElementById('streak-leaders-list');
+      const sorted = [...enrichedHabits]
+        .sort((a, b) => b.currentStreak - a.currentStreak || b.longestStreak - a.longestStreak)
+        .slice(0, 4);
+
+      if (sorted.length === 0) {
+        container.innerHTML = `<p class="text-xs text-slate-500">${tr('No habits logged yet.')}</p>`;
+        return;
+      }
+
+      container.innerHTML = sorted.map((h) => `
+        <div class="p-2.5 rounded-xl bg-slate-950/60 border border-slate-800/80 flex items-center justify-between gap-2">
+          <div class="flex items-center gap-2.5 min-w-0">
+            <span class="text-base">${h.icon || '✨'}</span>
+            <div class="min-w-0">
+              <p class="text-xs font-semibold text-slate-200 truncate">${escapeHtml(tr(h.name))}</p>
+              <p class="text-[10px] text-slate-400">${tr('All-time record:')} <strong class="text-slate-300">${nf(h.longestStreak)}${tr('d')}</strong></p>
+            </div>
+          </div>
+          <div class="px-2.5 py-1 rounded-lg bg-amber-500/10 border border-amber-500/25 text-amber-300 text-xs font-bold flex items-center gap-1 shrink-0">
+            <span>🔥</span>
+            <span>${nf(h.currentStreak)}${tr('d')}</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // --- 6. USER INTERACTION HANDLERS ---
+    function toggleHabitCompletion(habitId, dateKey) {
+      state.habits = state.habits.map((h) => {
+        if (h.id !== habitId) return h;
+        const updatedDates = { ...h.completedDates };
+        if (updatedDates[dateKey]) {
+          delete updatedDates[dateKey];
+        } else {
+          updatedDates[dateKey] = true;
+        }
+        return { ...h, completedDates: updatedDates };
+      });
+      saveHabits();
+      renderApp();
+    }
+
+    function selectCategory(categoryId) {
+      state.selectedCategory = categoryId;
+      renderApp();
+    }
+
+    function changeWeek(delta) {
+      state.weekOffset = Math.min(0, state.weekOffset + delta);
+      renderApp();
+    }
+
+    function resetToCurrentWeek() {
+      state.weekOffset = 0;
+      renderApp();
+    }
+
+    function markAllToday() {
+      const todayKey = formatDateKey(today);
+      state.habits = state.habits.map((h) => {
+        if (state.selectedCategory !== 'All' && h.category !== state.selectedCategory) return h;
+        return {
+          ...h,
+          completedDates: {
+            ...h.completedDates,
+            [todayKey]: true
+          }
+        };
+      });
+      saveHabits();
+      renderApp();
+    }
+
+    // --- 7. MODAL HANDLERS (ADD, INSTALL, BACKUP, DELETE) ---
+    function renderEmojiPicker() {
+      const grid = document.getElementById('emoji-picker-grid');
+      grid.innerHTML = EMOJI_OPTIONS.map((emoji) => `
+        <button
+          type="button"
+          onclick="selectEmoji('${emoji}')"
+          class="h-10 rounded-xl text-lg flex items-center justify-center border transition ${
+            state.selectedEmoji === emoji
+              ? 'bg-indigo-600/25 border-indigo-500 scale-105'
+              : 'bg-slate-950 border-slate-800 hover:border-slate-700'
+          }"
+        >
+          ${emoji}
+        </button>
+      `).join('');
+    }
+
+    function selectEmoji(emoji) {
+      state.selectedEmoji = emoji;
+      renderEmojiPicker();
+    }
+
+    function openAddModal() {
+      state.selectedEmoji = '💧';
+      document.getElementById('new-habit-name').value = '';
+      document.getElementById('add-habit-error').classList.add('hidden');
+      renderEmojiPicker();
+      const modal = document.getElementById('add-habit-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      setTimeout(() => document.getElementById('new-habit-name').focus(), 50);
+    }
+
+    function closeAddModal() {
+      const modal = document.getElementById('add-habit-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function handleAddHabitSubmit(e) {
+      e.preventDefault();
+      const nameInput = document.getElementById('new-habit-name');
+      const trimmed = nameInput.value.trim();
+      if (!trimmed) {
+        document.getElementById('add-habit-error').classList.remove('hidden');
+        return;
+      }
+
+      const category = document.getElementById('new-habit-category').value;
+      const target = Number(document.getElementById('new-habit-target').value) || 5;
+
+      const newHabit = {
+        id: 'h-' + Date.now(),
+        name: trimmed,
+        category,
+        icon: state.selectedEmoji,
+        targetPerWeek: target,
+        completedDates: {}
+      };
+
+      state.habits = [newHabit, ...state.habits];
+      saveHabits();
+      closeAddModal();
+      renderApp();
+    }
+
+    function openInstallModal() {
+      const modal = document.getElementById('install-guide-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeInstallModal() {
+      const modal = document.getElementById('install-guide-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function openBackupModal() {
+      const msg = document.getElementById('backup-status-msg');
+      msg.classList.add('hidden');
+      const modal = document.getElementById('backup-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeBackupModal() {
+      const modal = document.getElementById('backup-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function exportHabitsJson() {
+      const dataStr = JSON.stringify(state.habits, null, 2);
+      const blob = new Blob([dataStr], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `momentum-habits-backup-${formatDateKey(today)}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      const msg = document.getElementById('backup-status-msg');
+      msg.textContent = tr('Backup file downloaded successfully!');
+      msg.classList.remove('hidden');
+    }
+
+    function importHabitsJson(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const parsed = JSON.parse(e.target.result);
+          if (Array.isArray(parsed)) {
+            state.habits = sanitizeHabits(parsed);
+            saveHabits();
+            renderApp();
+            const msg = document.getElementById('backup-status-msg');
+            msg.textContent = tr('Habits restored successfully!');
+            msg.classList.remove('hidden');
+          }
+        } catch (err) {
+          const msg = document.getElementById('backup-status-msg');
+          msg.textContent = tr('Invalid JSON backup file.');
+          msg.classList.remove('hidden');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function handleResetDemoData() {
+      state.habits = generateInitialHabits(today);
+      state.weekOffset = 0;
+      state.selectedCategory = 'All';
+      saveHabits();
+      renderApp();
+      closeBackupModal();
+    }
+
+    function openDeleteModal(habitId) {
+      const found = state.habits.find((h) => h.id === habitId);
+      if (!found) return;
+      state.habitIdToDelete = habitId;
+      document.getElementById('delete-habit-title').textContent = `"${tr(found.name)}"`;
+      const modal = document.getElementById('delete-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeDeleteModal() {
+      state.habitIdToDelete = null;
+      const modal = document.getElementById('delete-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function confirmDeleteHabit() {
+      if (!state.habitIdToDelete) return;
+      state.habits = state.habits.filter((h) => h.id !== state.habitIdToDelete);
+      saveHabits();
+      closeDeleteModal();
+      renderApp();
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    // ===== 8. i18n (English / فارسی) =====
+    const GOOGLE_CLIENT_ID = '204895682256-a0j708crlbvpsicfccso1p1t88ml1kpv.apps.googleusercontent.com'; // public web client ID (not a secret)
+    const I18N = [
+      ['Backup','پشتیبان‌گیری'],['Complete Today','تکمیل امروز'],['New Habit','عادت جدید'],['Current Week','هفته جاری'],
+      ['Account','حساب کاربری'],['Weekly Habit Matrix','ماتریس هفتگی عادت‌ها'],['Tap any day box to log or toggle your daily habit completion.','برای ثبت یا لغو انجام عادت، روی هر روز بزنید.'],
+      ['Completed','انجام‌شده'],['Pending','در انتظار'],['Weekly Streak Chart','نمودار هفتگی'],['Daily completion rate across the week','درصد انجام روزانه در طول هفته'],
+      ['Tap or hover any bar to inspect daily rate','برای دیدن جزئیات روی ستون‌ها بزنید'],['100% Perfect Day','روز کامل ۱۰۰٪'],['In Progress','در حال انجام'],
+      ['Category Adherence','پایبندی به دسته‌ها'],['Weekly target completion by life area','تحقق هدف هفتگی در هر حوزه'],['Streak Leaders','برترین زنجیره‌ها'],['Active vs Best','فعلی در برابر بهترین'],
+      ["Today's Focus",'تمرکز امروز'],['Active Streak','زنجیره فعال'],['All-Time Best','بهترین رکورد'],['Weekly Goal','هدف هفتگی'],['Streak','زنجیره'],['Habit & Category','عادت و دسته'],
+      ['Create New Habit','ساخت عادت جدید'],['Set a clear daily action and weekly frequency','یک کار روزانه و تعداد دفعات هفتگی مشخص کنید'],['Habit Name','نام عادت'],['Choose Icon','انتخاب آیکون'],
+      ['Category','دسته‌بندی'],['Health & Fitness','سلامت و تناسب اندام'],['Mindfulness','ذهن‌آگاهی'],['Productivity','بهره‌وری'],['Growth & Skill','رشد و مهارت'],['All Habits','همه عادت‌ها'],
+      ['Weekly Target (','هدف هفتگی ('],[' days/wk)',' روز در هفته)'],['Every day','هر روز'],['Cancel','انصراف'],['Add Habit','افزودن عادت'],['Please enter a habit name.','لطفاً نام عادت را وارد کنید.'],
+      ['Data Backup & Sync','پشتیبان‌گیری و همگام‌سازی'],['Your habits are saved automatically on this device','عادت‌ها خودکار روی همین دستگاه ذخیره می‌شوند'],['Export Backup File (.json)','دریافت فایل پشتیبان (.json)'],
+      ['Download all habits and streak logs to your phone','دانلود همه عادت‌ها و سابقه‌ها'],['Download','دانلود'],['Restore from Backup','بازیابی از پشتیبان'],['Load a previously exported JSON backup file','بارگذاری فایل پشتیبان قبلی'],
+      ['Import File','انتخاب فایل'],['Reset to Demo Data','بازنشانی به داده نمونه'],['Restore original sample habits and streaks','بازگرداندن عادت‌های نمونه'],['Reset Demo','بازنشانی'],
+      ['Remove Habit?','حذف عادت؟'],['and its streak history?','و سابقه آن؟'],['Keep Habit','نگه‌دار'],['Delete','حذف'],
+      ['Account & Drive Backup','حساب کاربری و پشتیبان درایو'],['Create a profile on this device. Your passphrase encrypts your Google Drive backup, so nobody (including this site) can read it.','روی این دستگاه یک پروفایل بسازید. گذرواژه، پشتیبان گوگل‌درایو شما را رمزگذاری می‌کند؛ پس هیچ‌کس (حتی این سایت) نمی‌تواند آن را بخواند.'],
+      ['Create account','ساخت حساب'],['Sign in','ورود'],['Sign out','خروج'],['Google Drive backup','پشتیبان گوگل‌درایو'],['Stored in a hidden app folder only this app can access. Auto-backup runs when you are online.','در پوشه پنهان مخصوص همین برنامه ذخیره می‌شود. با اتصال به اینترنت، پشتیبان خودکار انجام می‌شود.'],
+      ['Connect & backup','اتصال و پشتیبان‌گیری'],['Restore','بازیابی'],
+      ['Sign in with Google','ورود با گوگل'],['Sign in with Google to back up your habits to your own Google Drive. Backups are encrypted with a passphrase only you know.','با گوگل وارد شوید تا عادت‌هایتان روی گوگل‌درایو خودتان پشتیبان‌گیری شود. پشتیبان‌ها با گذرواژه‌ای که فقط شما می‌دانید رمزگذاری می‌شوند.'],['Your passphrase encrypts the backup on this device before upload. Google cannot read it, and it cannot be recovered if forgotten.','گذرواژه شما پیش از ارسال، پشتیبان را روی همین دستگاه رمزگذاری می‌کند. گوگل نمی‌تواند آن را بخواند و در صورت فراموشی قابل بازیابی نیست.'],
+      ['Got it','متوجه شدم'],
+      // dynamic strings
+      ['All daily goals done! 🎉','همه کارهای امروز انجام شد! 🎉'],['left for today','کار باقی‌مانده برای امروز'],['Check in today!','امروز ثبت کنید!'],['Personal record','رکورد شخصی'],
+      ['Current week pace','روند هفته جاری'],['days','روز'],['habit','عادت'],['habits','عادت'],['goal','هدف'],['d','روز'],['Best:','بهترین:'],['All-time record:','رکورد کل:'],['check-ins','ثبت'],['Today','امروز'],
+      ['No habits logged yet.','هنوز عادتی ثبت نشده.'],['No habits in this category','عادتی در این دسته نیست'],['Add a new daily habit to start tracking your weekly consistency.','یک عادت روزانه اضافه کنید تا پیگیری را شروع کنید.'],['+ Create Habit','+ ساخت عادت'],
+      ['Backup file downloaded successfully!','فایل پشتیبان دانلود شد!'],['Habits restored successfully!','عادت‌ها بازیابی شدند!'],['Invalid JSON backup file.','فایل پشتیبان نامعتبر است.'],
+      ['Health','سلامت و تناسب اندام'],['Learning','رشد و مهارت'],
+      ['Morning Hydration (500ml)','نوشیدن آب صبحگاهی (۵۰۰ میلی‌لیتر)'],['Deep Work Session (90m)','کار عمیق (۹۰ دقیقه)'],['15m Mindfulness Meditation','۱۵ دقیقه مدیتیشن'],['Read 20 Pages Non-Fiction','مطالعه ۲۰ صفحه کتاب غیرداستانی'],['Strength or Zone 2 Cardio','قدرتی یا هوازی سبک']
+    ];
+    const EN2FA = Object.fromEntries(I18N), FA2EN = Object.fromEntries(I18N.map(([e, f]) => [f, e]));
+    const PH = [['new-habit-name','e.g., Read 20 pages, Morning 5k run...','مثلاً: ۲۰ صفحه مطالعه، دویدن صبحگاهی...'],['acc-sync-pass','Backup passphrase (min 6 chars)','گذرواژه پشتیبان (حداقل ۶ نویسه)']];
+    let lang = localStorage.getItem('momentum_lang') || ((navigator.language || '').startsWith('fa') ? 'fa' : 'en');
+    const LOC = () => (lang === 'fa' ? 'fa-IR' : 'en-US');
+    const tr = (s) => (lang === 'fa' ? EN2FA[s] : null) || s;
+    const nf = (n) => (lang === 'fa' ? Number(n).toLocaleString('fa-IR', { useGrouping: false }) : n);
+    function applyLang() {
+      const root = document.documentElement;
+      root.lang = lang; root.dir = lang === 'fa' ? 'rtl' : 'ltr';
+      document.getElementById('lang-btn').textContent = lang === 'fa' ? 'English' : 'فارسی';
+      const map = lang === 'fa' ? EN2FA : FA2EN;
+      const w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+      let n; while ((n = w.nextNode())) {
+        if (n.parentElement.closest('script,style')) continue;
+        const s = n.nodeValue.trim();
+        if (s && map[s] && !(lang === 'en' && /[\u0600-\u06FF]/.test(s) && n.parentElement.closest('#install-guide-modal'))) n.nodeValue = n.nodeValue.replace(s, map[s]);
+      }
+      PH.forEach(([id, en, fa]) => { const el = document.getElementById(id); if (el) el.placeholder = lang === 'fa' ? fa : en; });
+      document.getElementById('account-btn-label').textContent = (profile() && profile().name) || (lang === 'fa' ? 'حساب کاربری' : 'Account');
+    }
+    function toggleLang() { lang = lang === 'fa' ? 'en' : 'fa'; localStorage.setItem('momentum_lang', lang); renderApp(); }
+
+    // ===== 9. Google sign-in (real identity) + per-account local data =====
+    // Identity comes from Google (stable `sub`). There is no server: the profile only tells this browser which
+    // dataset to open. It does not protect data already stored on this device.
+    const ACC_KEY = 'momentum_accounts_v2';
+    let acc = { profiles: {}, current: null };
+    try { const a = JSON.parse(localStorage.getItem(ACC_KEY)); if (a && a.profiles) acc = a; } catch (e) {}
+    var sessionPass = null, driveToken = null, dirty = false, syncTimer = null;
+    const habitsKey = () => (acc.current ? STORAGE_KEY + ':' + acc.current : STORAGE_KEY);
+    const saveAcc = () => localStorage.setItem(ACC_KEY, JSON.stringify(acc));
+    const profile = () => acc.profiles[acc.current] || null;
+    const b64 = (buf) => btoa(String.fromCharCode(...new Uint8Array(buf)));
+    const unb64 = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
+    async function pbkdf2(pass, salt, usage, iter = 200000) {
+      const base = await crypto.subtle.importKey('raw', new TextEncoder().encode(pass), 'PBKDF2', false, ['deriveKey', 'deriveBits']);
+      const p = { name: 'PBKDF2', salt, iterations: iter, hash: 'SHA-256' };
+      return usage === 'bits' ? crypto.subtle.deriveBits(p, base, 256) : crypto.subtle.deriveKey(p, base, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
+    }
+    function accMsg(m) { const el = document.getElementById('acc-msg'); el.textContent = m; el.classList.toggle('hidden', !m); }
+    function openAccountModal() { refreshAccountUI(); const m = document.getElementById('account-modal'); m.classList.remove('hidden'); m.classList.add('flex'); }
+    function closeAccountModal() { const m = document.getElementById('account-modal'); m.classList.add('hidden'); m.classList.remove('flex'); }
+    function refreshAccountUI() {
+      const p = profile();
+      document.getElementById('acc-guest').classList.toggle('hidden', !!p);
+      document.getElementById('acc-user').classList.toggle('hidden', !p);
+      document.getElementById('acc-current').textContent = p ? p.name : '';
+      document.getElementById('acc-email').textContent = p ? p.email : '';
+      accMsg('');
+    }
+    async function googleSignIn() {
+      accMsg('');
+      try {
+        await driveAuth(true); // one consent screen: identity + Drive app-data
+        const u = await (await driveFetch('https://www.googleapis.com/oauth2/v3/userinfo')).json();
+        if (!u.sub) throw new DriveError('auth', 0, 'no user id');
+        const first = !acc.profiles[u.sub];
+        acc.profiles[u.sub] = { name: u.name || u.email || 'User', email: u.email || '' };
+        acc.current = u.sub; saveAcc();
+        if (first) { const guest = localStorage.getItem(STORAGE_KEY); if (guest && !localStorage.getItem(habitsKey())) localStorage.setItem(habitsKey(), guest); }
+        afterAuth();
+        setSync('idle', E('Signed in. Enter a backup passphrase to back up or restore.', 'وارد شدید. برای پشتیبان‌گیری یا بازیابی، گذرواژه پشتیبان را وارد کنید.'));
+      } catch (e) { console.error(e); accMsg(driveErrMsg(e)); }
+    }
+    function accSignOut() {
+      try { if (driveToken && window.google && google.accounts) google.accounts.oauth2.revoke(driveToken.t, () => {}); } catch (e) {}
+      acc.current = null; sessionPass = null; driveToken = null; driveConnected = false; dirty = false; saveAcc(); afterAuth();
+    }
+    function afterAuth() { loadHabits(); refreshAccountUI(); renderApp(); }
+
+    // ===== 10. Google Drive backup (AES-GCM encrypted, appDataFolder, token stays in the browser) =====
+    const DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.appdata', DRIVE_FILE = 'momentum-backup.json';
+    const SCOPES = 'openid email profile ' + DRIVE_SCOPE;
+    const KDF_ITER = 600000, AAD = new TextEncoder().encode('momentum-backup-v2');
+    const E = (en, fa) => (lang === 'fa' ? fa : en);
+    const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+    let syncing = false, retryCount = 0, rev = 0, driveConnected = false, lastStatus = ['idle', ''];
+
+    class DriveError extends Error {
+      constructor(code, status = 0, detail = '') { super(code); this.code = code; this.status = status; this.detail = detail; }
+    }
+    function driveErrMsg(e) {
+      const s = e.status ? ` (HTTP ${e.status})` : '';
+      const M = {
+        'no-client-id': E('GOOGLE_CLIENT_ID is not set in the code.', 'GOOGLE_CLIENT_ID در کد تنظیم نشده است.'),
+        'no-pass': E('Enter your passphrase first.', 'ابتدا گذرواژه را وارد کنید.'),
+        'offline': E('No connection. The backup will retry when you are online.', 'اتصال اینترنت برقرار نیست. با اتصال دوباره، پشتیبان‌گیری تکرار می‌شود.'),
+        'timeout': E('Google did not respond in time. Will retry.', 'گوگل به‌موقع پاسخ نداد. دوباره تلاش می‌شود.'),
+        'gsi-blocked': E('Google sign-in script could not load (blocked network or ad-blocker?).', 'اسکریپت ورود گوگل بارگذاری نشد (شبکه یا افزونه مسدودکننده؟).'),
+        'popup_closed': E(`Sign-in window was closed. If you saw "origin_mismatch", add ${location.origin} to Authorized JavaScript origins.`, `پنجره ورود بسته شد. اگر خطای origin_mismatch دیدید، ${location.origin} را در Authorized JavaScript origins اضافه کنید.`),
+        'popup_blocked': E('The browser blocked the sign-in popup. Allow popups and try again.', 'مرورگر پنجره ورود را مسدود کرد. اجازه popup بدهید و دوباره تلاش کنید.'),
+        'scope': E('Drive access was not granted. Tick the Drive app-data permission when signing in.', 'دسترسی به درایو داده نشد. هنگام ورود، مجوز داده‌های برنامه را فعال کنید.'),
+        'reauth': E('Google session expired. Tap "Connect & backup" to sign in again.', 'نشست گوگل منقضی شده. دوباره «اتصال و پشتیبان‌گیری» را بزنید.'),
+        'auth': E('Google sign-in failed' + (e.detail ? ': ' + e.detail : '.'), 'ورود به گوگل ناموفق بود' + (e.detail ? ': ' + e.detail : '.')),
+        'api-disabled': E('Google Drive API is not enabled for this project in Google Cloud.', 'Google Drive API در پروژه Google Cloud فعال نشده است.') + s,
+        'forbidden': E('Google refused the request' + s + (e.detail ? ': ' + e.detail : '.'), 'گوگل درخواست را رد کرد' + s + (e.detail ? ': ' + e.detail : '.')),
+        'quota': E('Drive storage is full or the quota is exceeded.', 'فضای درایو پر است یا سهمیه تمام شده است.') + s,
+        'rate': E('Too many requests. Will retry shortly.', 'درخواست‌ها زیاد بود. به‌زودی دوباره تلاش می‌شود.'),
+        'server': E('Google servers are having trouble. Will retry.', 'سرورهای گوگل مشکل دارند. دوباره تلاش می‌شود.') + s,
+        'notfound': E('No backup found on Drive.', 'پشتیبانی روی درایو پیدا نشد.'),
+        'bad-backup': E('The backup file is corrupted or has an unknown format.', 'فایل پشتیبان خراب است یا قالب ناشناخته دارد.'),
+        'wrong-pass': E('Wrong passphrase, or the backup was modified.', 'گذرواژه اشتباه است یا فایل پشتیبان دستکاری شده.'),
+        'cancelled': E('Cancelled.', 'لغو شد.')
+      };
+      return M[e.code] || E('Unexpected error' + s + (e.detail ? ': ' + e.detail : '.'), 'خطای غیرمنتظره' + s + (e.detail ? ': ' + e.detail : '.'));
+    }
+    function setSync(kind, msg) {
+      lastStatus = [kind, msg || ''];
+      const L = { idle: ['PWA Ready', 'آماده'], syncing: ['Syncing…', 'در حال همگام‌سازی…'], ok: ['Backed up', 'پشتیبان‌گیری شد'], pending: ['Backup pending', 'پشتیبان در انتظار'], error: ['Backup error', 'خطای پشتیبان'] }[kind];
+      const b = document.getElementById('pwa-status-badge');
+      if (b) { b.textContent = lang === 'fa' ? L[1] : L[0]; b.title = msg || ''; }
+      const el = document.getElementById('drive-status');
+      if (el) { el.textContent = msg || ''; el.className = 'text-[11px] ' + (kind === 'error' ? 'text-rose-400' : kind === 'ok' ? 'text-emerald-400' : 'text-slate-400'); }
+    }
+    const dstat = (m) => setSync(lastStatus[0], m);
+
+    // ---- data hygiene: backups/imports are untrusted input ----
+    function sanitizeHabits(list) {
+      if (!Array.isArray(list)) throw new DriveError('bad-backup');
+      const cats = ['Health', 'Mindfulness', 'Productivity', 'Learning'];
+      return list.filter((h) => h && typeof h === 'object').map((h, i) => {
+        const dates = {};
+        if (h.completedDates && typeof h.completedDates === 'object') Object.keys(h.completedDates).forEach((k) => { if (/^\d{4}-\d{2}-\d{2}$/.test(k) && h.completedDates[k]) dates[k] = true; });
+        return {
+          id: String(h.id || 'h-' + Date.now() + '-' + i).replace(/[^\w-]/g, '').slice(0, 40) || 'h-' + i,
+          name: String(h.name || '').slice(0, 120) || '—',
+          category: cats.includes(h.category) ? h.category : 'Health',
+          icon: String(h.icon || '✨').replace(/[<>&"'`]/g, '').slice(0, 8) || '✨',
+          targetPerWeek: Math.min(7, Math.max(1, Number(h.targetPerWeek) || 5)),
+          completedDates: dates
+        };
+      });
+    }
+
+    // ---- crypto: AES-256-GCM, PBKDF2-SHA256 (600k), fresh salt+IV per backup, versioned AAD ----
+    async function encryptBackup() {
+      const salt = crypto.getRandomValues(new Uint8Array(16)), iv = crypto.getRandomValues(new Uint8Array(12));
+      const key = await pbkdf2(sessionPass, salt, 'key', KDF_ITER);
+      const plain = new TextEncoder().encode(JSON.stringify({ updatedAt: Date.now(), habits: state.habits }));
+      const data = await crypto.subtle.encrypt({ name: 'AES-GCM', iv, additionalData: AAD }, key, plain);
+      return JSON.stringify({ v: 2, kdf: { name: 'PBKDF2', hash: 'SHA-256', iter: KDF_ITER }, salt: b64(salt), iv: b64(iv), data: b64(data) });
+    }
+    async function decryptBackup(env) {
+      if (!env || ![1, 2].includes(env.v) || !env.salt || !env.iv || !env.data) throw new DriveError('bad-backup');
+      const iter = env.v === 2 && env.kdf ? Number(env.kdf.iter) : 200000;
+      if (!(iter >= 100000 && iter <= 2000000)) throw new DriveError('bad-backup');
+      const key = await pbkdf2(sessionPass, unb64(env.salt), 'key', iter);
+      const p = { name: 'AES-GCM', iv: unb64(env.iv) };
+      if (env.v === 2) p.additionalData = AAD;
+      let plain;
+      try { plain = await crypto.subtle.decrypt(p, key, unb64(env.data)); } catch (e) { throw new DriveError('wrong-pass'); }
+      try { return { habits: sanitizeHabits(JSON.parse(new TextDecoder().decode(plain)).habits) }; } catch (e) { throw new DriveError('bad-backup'); }
+    }
+
+    // ---- Google auth ----
+    function loadGsi() {
+      return new Promise((res, rej) => {
+        if (window.google && google.accounts && google.accounts.oauth2) return res();
+        const s = document.createElement('script'); s.src = 'https://accounts.google.com/gsi/client';
+        s.onload = res; s.onerror = () => rej(new DriveError('gsi-blocked')); document.head.appendChild(s);
+      });
+    }
+    async function driveAuth(interactive) {
+      if (!GOOGLE_CLIENT_ID) throw new DriveError('no-client-id');
+      if (driveToken && driveToken.exp > Date.now() + 60000) return driveToken.t;
+      await loadGsi();
+      return new Promise((res, rej) => {
+        const timer = setTimeout(() => rej(new DriveError('timeout')), interactive ? 120000 : 15000);
+        const done = (fn, v) => { clearTimeout(timer); fn(v); };
+        google.accounts.oauth2.initTokenClient({
+          client_id: GOOGLE_CLIENT_ID, scope: SCOPES,
+          callback: (r) => {
+            if (r.error) return done(rej, new DriveError(['interaction_required', 'consent_required', 'login_required'].includes(r.error) ? 'reauth' : 'auth', 0, r.error_description || r.error));
+            if (!google.accounts.oauth2.hasGrantedAllScopes(r, DRIVE_SCOPE)) return done(rej, new DriveError('scope'));
+            driveToken = { t: r.access_token, exp: Date.now() + (r.expires_in || 3000) * 1000 };
+            done(res, r.access_token);
+          },
+          error_callback: (err) => done(rej, new DriveError(err.type === 'popup_closed' ? 'popup_closed' : err.type === 'popup_failed_to_open' ? 'popup_blocked' : (interactive ? 'auth' : 'reauth'), 0, err.type))
+        }).requestAccessToken({ prompt: interactive ? '' : 'none' });
+      });
+    }
+    function classify(status, reason) {
+      if (status === 401) return 'reauth';
+      if (status === 403) {
+        if (/accessNotConfigured|SERVICE_DISABLED/i.test(reason)) return 'api-disabled';
+        if (/insufficientPermissions|SCOPE_INSUFFICIENT/i.test(reason)) return 'scope';
+        if (/storageQuotaExceeded|quotaExceeded/i.test(reason)) return 'quota';
+        if (/rateLimit/i.test(reason)) return 'rate';
+        return 'forbidden';
+      }
+      if (status === 404) return 'notfound';
+      if (status === 429) return 'rate';
+      if (status >= 500) return 'server';
+      return 'unknown';
+    }
+    // fetch with timeout, token refresh on 401 (once), exponential backoff on 429/5xx/network errors
+    async function driveFetch(url, opts = {}, interactive = false) {
+      let reauthed = false;
+      for (let attempt = 0; attempt < 4; attempt++) {
+        if (!navigator.onLine) throw new DriveError('offline');
+        const t = await driveAuth(interactive);
+        const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 25000);
+        let r;
+        try { r = await fetch(url, { ...opts, headers: { ...(opts.headers || {}), Authorization: 'Bearer ' + t }, signal: ctl.signal }); }
+        catch (e) { clearTimeout(to); if (attempt < 3) { await sleep(800 * 2 ** attempt); continue; } throw new DriveError(e.name === 'AbortError' ? 'timeout' : 'offline', 0, e.message); }
+        clearTimeout(to);
+        if (r.ok) return r;
+        let body = {}; try { body = await r.json(); } catch (e) {}
+        const er = body.error || {}, reason = (er.errors && er.errors[0] && er.errors[0].reason) || er.status || '';
+        if (r.status === 401 && !reauthed) { driveToken = null; reauthed = true; continue; }
+        const code = classify(r.status, reason);
+        if (['rate', 'server'].includes(code) && attempt < 3) { await sleep(1000 * 2 ** attempt + Math.random() * 300); continue; }
+        throw new DriveError(code, r.status, er.message || reason);
+      }
+      throw new DriveError('unknown');
+    }
+    async function findDriveFile(interactive) {
+      const q = encodeURIComponent(`name='${DRIVE_FILE}' and trashed=false`);
+      const r = await driveFetch(`https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=${q}&orderBy=modifiedTime%20desc&pageSize=1&fields=files(id,modifiedTime)`, {}, interactive);
+      return ((await r.json()).files || [])[0];
+    }
+    async function driveBackup(interactive, existing) {
+      if (!acc.current || !sessionPass) throw new DriveError('no-pass');
+      if (syncing) return;
+      syncing = true; setSync('syncing');
+      const myRev = rev;
+      try {
+        const f = existing === undefined ? await findDriveFile(interactive) : existing;
+        const body = await encryptBackup(), bnd = 'mmtm' + Date.now();
+        const meta = f ? {} : { name: DRIVE_FILE, parents: ['appDataFolder'] };
+        const multipart = `--${bnd}\r\nContent-Type: application/json\r\n\r\n${JSON.stringify(meta)}\r\n--${bnd}\r\nContent-Type: application/json\r\n\r\n${body}\r\n--${bnd}--`;
+        await driveFetch(`https://www.googleapis.com/upload/drive/v3/files${f ? '/' + f.id : ''}?uploadType=multipart`, { method: f ? 'PATCH' : 'POST', headers: { 'Content-Type': 'multipart/related; boundary=' + bnd }, body: multipart }, interactive);
+        driveConnected = true; retryCount = 0;
+        if (rev === myRev) dirty = false; else { dirty = true; syncTimer = setTimeout(trySync, 2000); }
+        setSync('ok', E('Last backup: ', 'آخرین پشتیبان: ') + new Date().toLocaleTimeString(LOC()));
+      } finally { syncing = false; }
+    }
+    function handleSyncFail(e, autoRetry) {
+      console.error('Drive error:', e.code, e.status, e.detail, e);
+      setSync(autoRetry && navigator.onLine === false ? 'pending' : 'error', driveErrMsg(e));
+      if (autoRetry && ['offline', 'timeout', 'server', 'rate', 'unknown'].includes(e.code) && retryCount < 5) {
+        retryCount++; clearTimeout(syncTimer); syncTimer = setTimeout(trySync, Math.min(300000, 5000 * 2 ** retryCount));
+      }
+    }
+    async function driveConnect() {
+      sessionPass = document.getElementById('acc-sync-pass').value || sessionPass;
+      if (!sessionPass || sessionPass.length < 6) return setSync('error', E('Enter a backup passphrase (min 6 characters).', 'گذرواژه پشتیبان را وارد کنید (حداقل ۶ نویسه).'));
+      try {
+        setSync('syncing');
+        const f = await findDriveFile(true);
+        if (f && !confirm(E(`A backup from ${new Date(f.modifiedTime).toLocaleString(LOC())} already exists on Drive.\nOverwrite it with this device's data?\n(Cancel, then use "Restore" to load it instead.)`, `روی درایو یک پشتیبان از ${new Date(f.modifiedTime).toLocaleString(LOC())} وجود دارد.\nبا داده‌های این دستگاه جایگزین شود؟\n(انصراف بزنید و از «بازیابی» استفاده کنید.)`))) { driveConnected = true; return setSync('idle', driveErrMsg(new DriveError('cancelled'))); }
+        if (!f) {
+          const again = prompt(E('Re-enter your backup passphrase to confirm. It cannot be recovered if forgotten.', 'برای تأیید، گذرواژه پشتیبان را دوباره وارد کنید. در صورت فراموشی قابل بازیابی نیست.'));
+          if (again !== sessionPass) { sessionPass = null; return setSync('error', E('Passphrases did not match.', 'گذرواژه‌ها یکسان نبودند.')); }
+        }
+        await driveBackup(true, f || null);
+      } catch (e) { handleSyncFail(e, false); }
+    }
+    async function driveRestore() {
+      sessionPass = document.getElementById('acc-sync-pass').value || sessionPass;
+      if (!sessionPass || sessionPass.length < 6) return setSync('error', E('Enter a backup passphrase (min 6 characters).', 'گذرواژه پشتیبان را وارد کنید (حداقل ۶ نویسه).'));
+      try {
+        setSync('syncing');
+        const f = await findDriveFile(true);
+        if (!f) throw new DriveError('notfound');
+        const r = await driveFetch(`https://www.googleapis.com/drive/v3/files/${f.id}?alt=media`, {}, true);
+        let env; try { env = await r.json(); } catch (e) { throw new DriveError('bad-backup'); }
+        const d = await decryptBackup(env);
+        if (!confirm(E('Replace current data with the Drive backup?', 'داده‌های فعلی با پشتیبان درایو جایگزین شود؟'))) return setSync('idle', driveErrMsg(new DriveError('cancelled')));
+        try { localStorage.setItem(habitsKey() + ':prev', JSON.stringify(state.habits)); } catch (e) {} // safety snapshot of the replaced data
+        state.habits = d.habits; saveHabits(); dirty = false; driveConnected = true; renderApp();
+        setSync('ok', E('Restored.', 'بازیابی انجام شد.'));
+      } catch (e) { handleSyncFail(e, false); }
+    }
+    // Auto-backup: debounced after changes, and when the connection returns. Never prompts the user.
+    function markDirty() { dirty = true; rev++; clearTimeout(syncTimer); syncTimer = setTimeout(trySync, 4000); if (driveConnected && lastStatus[0] === 'ok') setSync('pending', E('Changes waiting to be backed up…', 'تغییرات در انتظار پشتیبان‌گیری…')); }
+    async function trySync() {
+      if (!dirty || syncing || !driveConnected || !sessionPass || !acc.current) return;
+      if (!navigator.onLine) return setSync('pending', driveErrMsg(new DriveError('offline')));
+      try { await driveBackup(false); } catch (e) { handleSyncFail(e, true); }
+    }
+    window.addEventListener('online', () => { retryCount = 0; trySync(); });
+    window.addEventListener('offline', () => { if (dirty && driveConnected) setSync('pending', driveErrMsg(new DriveError('offline'))); });
+
+    // Initialize Application
+    window.addEventListener('DOMContentLoaded', () => { loadHabits(); renderApp(); });
+
+  </script>
+</body>
+</html>
