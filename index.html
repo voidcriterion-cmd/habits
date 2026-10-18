@@ -193,6 +193,29 @@
   <!-- Main Dashboard Container -->
   <main class="relative z-10 max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 pt-5 space-y-5">
 
+    <!-- Global Storage Error Alert Banner -->
+    <div id="global-storage-error-banner" class="hidden bg-rose-950/80 border border-rose-500/50 rounded-2xl p-4 flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-lg text-rose-200">
+      <div class="flex items-center gap-3 min-w-0">
+        <div class="w-10 h-10 rounded-xl bg-rose-500/20 border border-rose-400/30 flex items-center justify-center text-rose-300 shrink-0">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+            <line x1="12" y1="9" x2="12" y2="13"></line>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          </svg>
+        </div>
+        <div class="min-w-0">
+          <h3 class="text-sm font-bold text-white">Browser Storage Error</h3>
+          <p id="global-storage-error-msg" class="text-xs text-rose-300">Your recent changes could not be saved because browser storage is full or disabled.</p>
+        </div>
+      </div>
+      <button
+        onclick="openBackupModal()"
+        class="px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-rose-600 hover:bg-rose-500 text-white shadow-md transition shrink-0 self-end sm:self-auto"
+      >
+        Export Backup
+      </button>
+    </div>
+
     <!-- Native PWA Install Prompt Banner (Shown automatically when browser triggers beforeinstallprompt) -->
     <div id="native-install-banner" class="hidden bg-gradient-to-r from-indigo-900/60 via-violet-900/50 to-slate-900/80 border border-indigo-500/40 rounded-2xl p-4 flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-lg">
       <div class="flex items-center gap-3">
@@ -229,6 +252,7 @@
         <div class="flex items-center bg-slate-950/90 border border-slate-800 rounded-xl p-1 w-full sm:w-auto justify-between">
           <button
             onclick="changeWeek(-1)"
+            aria-label="Previous Week"
             class="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 active:scale-95 transition"
             title="Previous Week"
           >
@@ -248,6 +272,7 @@
           <button
             id="next-week-btn"
             onclick="changeWeek(1)"
+            aria-label="Next Week"
             class="p-2 rounded-lg transition"
             title="Next Week"
           >
@@ -399,7 +424,7 @@
 
       <form onsubmit="handleAddHabitSubmit(event)" class="space-y-4">
         <div>
-          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
+          <label for="new-habit-name" class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
             Habit Name
           </label>
           <input
@@ -422,7 +447,7 @@
         <!-- Category & Weekly Target -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
+            <label for="new-habit-category" class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
               Category
             </label>
             <select
@@ -437,7 +462,7 @@
           </div>
 
           <div>
-            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
+            <label for="new-habit-target" class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
               Weekly Target (<span id="target-days-label">5</span> days/wk)
             </label>
             <input
@@ -495,7 +520,7 @@
             <p class="text-xs text-slate-400">اجرای تمام‌صفحه و ذخیره اطلاعات روی دستگاه</p>
           </div>
         </div>
-        <button onclick="closeInstallModal()" class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">
+        <button onclick="closeInstallModal()" aria-label="Close modal" class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">
           <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="18" y1="6" x2="6" y2="18"></line>
             <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -563,7 +588,7 @@
           <h3 class="text-base font-bold text-white">Data Backup & Sync</h3>
           <p class="text-xs text-slate-400">Your habits are saved automatically on this device</p>
         </div>
-        <button onclick="closeBackupModal()" class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">
+        <button onclick="closeBackupModal()" aria-label="Close modal" class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">
           <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="18" y1="6" x2="6" y2="18"></line>
             <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -658,7 +683,7 @@
     <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-2xl space-y-4 animate-pop max-h-[90vh] overflow-y-auto">
       <div class="flex items-center justify-between">
         <h3 class="text-base font-bold text-white">Account & Drive Backup</h3>
-        <button onclick="closeAccountModal()" class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">✕</button>
+        <button onclick="closeAccountModal()" aria-label="Close modal" class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">✕</button>
       </div>
       <div id="acc-guest" class="space-y-3">
         <p class="text-xs text-slate-400">Sign in with Google to back up your habits to your own Google Drive. Backups are encrypted with a passphrase only you know.</p>
@@ -920,9 +945,9 @@
     function loadHabits() {
       try {
         const raw = localStorage.getItem(habitsKey());
-        if (raw) {
+        if (raw !== null) {
           const parsed = JSON.parse(raw);
-          if (Array.isArray(parsed) && parsed.length > 0) {
+          if (Array.isArray(parsed)) {
             state.habits = sanitizeHabits(parsed);
             return;
           }
@@ -938,8 +963,49 @@
       try {
         localStorage.setItem(habitsKey(), JSON.stringify(state.habits));
         markDirty();
+        clearStorageErrorNotice();
+        return true;
       } catch (e) {
         console.error('Error saving habits:', e);
+        showStorageErrorNotice(e);
+        return false;
+      }
+    }
+
+    function clearStorageErrorNotice() {
+      const banner = document.getElementById('global-storage-error-banner');
+      if (banner) banner.classList.add('hidden');
+    }
+
+    function showStorageErrorNotice(e) {
+      let isQuota = false;
+      if (e) {
+        isQuota = e.name === 'QuotaExceededError' || e.name === 'NS_ERROR_DOM_QUOTA_REACHED' || e.code === 22 || e.code === 1014;
+      }
+      const msg = isQuota
+        ? tr('Storage limit reached! Your browser storage is full, so recent changes could not be saved.')
+        : tr('Unable to save changes to browser storage. Check your browser privacy settings.');
+
+      const badge = document.getElementById('pwa-status-badge');
+      if (badge) {
+        badge.textContent = tr('Storage Error');
+        badge.title = msg;
+        badge.className = 'text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-rose-500/15 text-rose-300 border border-rose-500/30';
+      }
+
+      const backupStatusMsg = document.getElementById('backup-status-msg');
+      if (backupStatusMsg) {
+        backupStatusMsg.textContent = msg;
+        backupStatusMsg.className = 'text-xs text-rose-400 text-center font-medium block';
+        backupStatusMsg.classList.remove('hidden');
+      }
+
+      const globalBanner = document.getElementById('global-storage-error-banner');
+      const globalMsg = document.getElementById('global-storage-error-msg');
+      if (globalBanner && globalMsg) {
+        globalMsg.textContent = msg;
+        globalBanner.classList.remove('hidden');
+        globalBanner.classList.add('flex');
       }
     }
 
@@ -1017,9 +1083,13 @@
       });
 
       const totalWeeklyCompletions = dailyStats.reduce((sum, d) => sum + d.count, 0);
+      const totalWeeklyCappedCompletions = filteredHabits.reduce(
+        (sum, h) => sum + Math.min(h.weeklyCompletedCount, h.targetPerWeek || 7),
+        0
+      );
       const totalWeeklyTargets = filteredHabits.reduce((sum, h) => sum + (h.targetPerWeek || 7), 0);
       const weeklyGoalPct = totalWeeklyTargets > 0
-        ? Math.min(100, Math.round((totalWeeklyCompletions / totalWeeklyTargets) * 100))
+        ? Math.min(100, Math.round((totalWeeklyCappedCompletions / totalWeeklyTargets) * 100))
         : 0;
 
       const maxCurrentStreak = filteredHabits.reduce((max, h) => Math.max(max, h.currentStreak), 0);
@@ -1248,7 +1318,7 @@
                       ${habit.icon || '✨'}
                     </div>
                     <div class="min-w-0">
-                      <p class="text-sm font-semibold text-slate-100 truncate">${escapeHtml(tr(habit.name))}</p>
+                      <p class="text-sm font-semibold text-slate-100 truncate" data-user-text="true">${escapeHtml(habit.name)}</p>
                       <div class="flex items-center gap-2 mt-0.5">
                         <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-medium border ${catTheme.bg} ${catTheme.text} ${catTheme.border}">
                           <span class="w-1.5 h-1.5 rounded-full ${catTheme.dot}"></span>
@@ -1367,7 +1437,7 @@
                           ${habit.icon || '✨'}
                         </div>
                         <div class="min-w-0">
-                          <p class="text-sm font-semibold text-slate-100 truncate">${escapeHtml(tr(habit.name))}</p>
+                          <p class="text-sm font-semibold text-slate-100 truncate" data-user-text="true">${escapeHtml(habit.name)}</p>
                           <div class="flex items-center gap-2 mt-1">
                             <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-medium border ${catTheme.bg} ${catTheme.text} ${catTheme.border}">
                               <span class="w-1.5 h-1.5 rounded-full ${catTheme.dot}"></span>
@@ -1522,7 +1592,10 @@
       const catStats = CATEGORIES.filter((c) => c.id !== 'All').map((cat) => {
         const catHabits = enrichedHabits.filter((h) => h.category === cat.id);
         const possible = catHabits.reduce((sum, h) => sum + (h.targetPerWeek || 7), 0);
-        const done = catHabits.reduce((sum, h) => sum + h.weeklyCompletedCount, 0);
+        const done = catHabits.reduce(
+          (sum, h) => sum + Math.min(h.weeklyCompletedCount, h.targetPerWeek || 7),
+          0
+        );
         const pct = possible > 0 ? Math.min(100, Math.round((done / possible) * 100)) : 0;
         return { ...cat, habitCount: catHabits.length, done, possible, pct };
       });
@@ -1566,7 +1639,7 @@
           <div class="flex items-center gap-2.5 min-w-0">
             <span class="text-base">${h.icon || '✨'}</span>
             <div class="min-w-0">
-              <p class="text-xs font-semibold text-slate-200 truncate">${escapeHtml(tr(h.name))}</p>
+              <p class="text-xs font-semibold text-slate-200 truncate" data-user-text="true">${escapeHtml(h.name)}</p>
               <p class="text-[10px] text-slate-400">${tr('All-time record:')} <strong class="text-slate-300">${nf(h.longestStreak)}${tr('d')}</strong></p>
             </div>
           </div>
@@ -1740,19 +1813,45 @@
       if (!file) return;
       const reader = new FileReader();
       reader.onload = function(e) {
+        const msg = document.getElementById('backup-status-msg');
         try {
           const parsed = JSON.parse(e.target.result);
-          if (Array.isArray(parsed)) {
-            state.habits = sanitizeHabits(parsed);
-            saveHabits();
-            renderApp();
-            const msg = document.getElementById('backup-status-msg');
-            msg.textContent = tr('Habits restored successfully!');
+
+          if (parsed && typeof parsed === 'object' && parsed.v && parsed.data && parsed.salt && parsed.iv) {
+            msg.textContent = tr('This file is an encrypted Google Drive backup. Use "Restore" in the Google Drive Backup section with your passphrase.');
+            msg.className = 'text-xs text-amber-400 text-center font-medium block';
             msg.classList.remove('hidden');
+            return;
+          }
+
+          let habitsToImport = null;
+          if (Array.isArray(parsed)) {
+            habitsToImport = parsed;
+          } else if (parsed && typeof parsed === 'object' && Array.isArray(parsed.habits)) {
+            habitsToImport = parsed.habits;
+          }
+
+          if (habitsToImport) {
+            const previousHabits = state.habits;
+            state.habits = sanitizeHabits(habitsToImport);
+            const saved = saveHabits();
+            if (saved) {
+              renderApp();
+              msg.textContent = tr('Habits restored successfully!');
+              msg.className = 'text-xs text-emerald-400 text-center font-medium block';
+              msg.classList.remove('hidden');
+            } else {
+              state.habits = previousHabits;
+              msg.textContent = tr('Failed to save imported habits to browser storage.');
+              msg.className = 'text-xs text-rose-400 text-center font-medium block';
+              msg.classList.remove('hidden');
+            }
+          } else {
+            throw new Error('Invalid JSON backup structure');
           }
         } catch (err) {
-          const msg = document.getElementById('backup-status-msg');
           msg.textContent = tr('Invalid JSON backup file.');
+          msg.className = 'text-xs text-rose-400 text-center font-medium block';
           msg.classList.remove('hidden');
         }
       };
@@ -1844,7 +1943,7 @@
       const map = lang === 'fa' ? EN2FA : FA2EN;
       const w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
       let n; while ((n = w.nextNode())) {
-        if (n.parentElement.closest('script,style')) continue;
+        if (n.parentElement.closest('script,style,[data-user-text="true"]')) continue;
         const s = n.nodeValue.trim();
         if (s && map[s] && !(lang === 'en' && /[\u0600-\u06FF]/.test(s) && n.parentElement.closest('#install-guide-modal'))) n.nodeValue = n.nodeValue.replace(s, map[s]);
       }
